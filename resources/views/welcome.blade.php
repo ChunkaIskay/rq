@@ -1,73 +1,95 @@
-@extends('layouts.app')
+<!doctype html>
+<html lang="{{ app()->getLocale() }}">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-@section('content')
- <div class="container">
+        <title>Laravel</title>
 
-    <!-- Outer Row -->
-    <div class="row justify-content-center">
+        <!-- Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
 
-      <div class="col-xl-10 col-lg-12 col-md-9">
+        <!-- Styles -->
+        <style>
+            html, body {
+                background-color: #fff;
+                color: #636b6f;
+                font-family: 'Raleway', sans-serif;
+                font-weight: 100;
+                height: 100vh;
+                margin: 0;
+            }
 
-        <div class="card o-hidden border-0 shadow-lg my-5">
-          <div class="card-body p-0">
-            <!-- Nested Row within Card Body -->
-            <div class="row">
-              <div class="col-lg-6 d-none d-lg-block bg-login-image"><img align="middle" src="{{ asset('img/logoSintesis.png') }}" alt="logo Sintesis"></div>
-              <div class="col-lg-6">
-                <div class="p-5">
-                  <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">
-                         Bienvenidos al sistema de Requerimientos!
-                    </h1>
-                  </div>
-                   <form class="form-horizontal" method="POST" action="{{ route('login') }}">
-                    {{ csrf_field() }}
-                    
-                  
-                    <div class="form-groupform-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                      <input type="email" class="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" name="email" value="{{ old('email') }}" placeholder="Ingrese su correo electrónico..." required autofocus>
-                            @if ($errors->has('email'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('email') }}</strong>
-                                </span>
-                            @endif
-                    </div>
-                    <br>
-                    <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                      <input type="password" class="form-control form-control-user" id="exampleInputPassword" name="password" placeholder="Ingrese su clave" required>
-                                 @if ($errors->has('password'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                    </div>
+            .full-height {
+                height: 100vh;
+            }
 
-                    <div class="form-group">
-                      <div class="custom-control custom-checkbox small">
-                        <input type="checkbox" class="custom-control-input" id="customCheck" name="remember" {{ old('remember') ? 'checked' : '' }}>
-                        <label class="custom-control-label" for="customCheck">Recordar inicio de sesión</label>
-                      </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-user btn-block">
-                        Login
-                    </button>
-                  </form>
-                  <hr>
-                  <div class="text-center">
-                    <a class="small"href="{{ route('password.request') }}">Olvidó tu contraseña?</a>
-                  </div>
-                  <div class="text-center">
-                    <a class="small" href="{{ route('register') }}">Cree su cuenta!</a>
-                  </div>
+            .flex-center {
+                align-items: center;
+                display: flex;
+                justify-content: center;
+            }
+
+            .position-ref {
+                position: relative;
+            }
+
+            .top-right {
+                position: absolute;
+                right: 10px;
+                top: 18px;
+            }
+
+            .content {
+                text-align: center;
+            }
+
+            .title {
+                font-size: 84px;
+            }
+
+            .links > a {
+                color: #636b6f;
+                padding: 0 25px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: .1rem;
+                text-decoration: none;
+                text-transform: uppercase;
+            }
+
+            .m-b-md {
+                margin-bottom: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="flex-center position-ref full-height">
+            @if (Route::has('login'))
+                <div class="top-right links">
+                    @auth
+                        <a href="{{ url('/home') }}">Home</a>
+                    @else
+                        <a href="{{ route('login') }}">Login</a>
+                        <a href="{{ route('register') }}">Register</a>
+                    @endauth
                 </div>
-              </div>
+            @endif
+
+            <div class="content">
+                <div class="title m-b-md">
+                    Laravel
+                </div>
+
+                <div class="links">
+                    <a href="https://laravel.com/docs">Documentation</a>
+                    <a href="https://laracasts.com">Laracasts</a>
+                    <a href="https://laravel-news.com">News</a>
+                    <a href="https://forge.laravel.com">Forge</a>
+                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                </div>
             </div>
-          </div>
         </div>
-
-      </div>
-
-    </div>
-
-  </div>
-@endsection
+    </body>
+</html>
