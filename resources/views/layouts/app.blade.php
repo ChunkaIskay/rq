@@ -10,9 +10,18 @@
 
     <title>Bienvenidos al sistema de Requerimientos!<!--{{ config('app.name', 'Bienvenidos al sistema de Requerimientos!') }}--></title>
     <!-- Custom fonts for this template-->
+
+    <script src="{{ asset('js/jquery/jquery-3.4.1.min.js') }}"></script>
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+     <!-- Custom fonts for this template -->
+     <link href="{{ asset('css/css.css') }}" rel="stylesheet" type="text/css">
+    
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="{{ asset('bootstrap/dist/css/bootstrap.min.css') }}"  rel="stylesheet" type="text/css">
     <!-- Custom styles for this template-->
-    <link href="{{ asset('css/sb-admin-2.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet" type="text/css">
+  <!-- Custom styles for this page -->
+   <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}"  rel="stylesheet" type="text/css">
 
 </head>
 <body id="page-top">
@@ -22,15 +31,15 @@
     @auth
     <!-- Sidebar -->
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-         <!-- Sidebar - Brand -->
-        @include('menu.brand')            
+         <!-- Sidebar - name rol -->
+        @include('menu.name_rol')            
      
       <!-- Divider -->
       <hr class="sidebar-divider my-0">
 
       <!-- Nav Item - Dashboard -->
       <li class="nav-item active">
-        <a class="nav-link" href="index.html">
+        <a class="nav-link" href="{{ route('home') }}">  
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Inicio</span></a>
       </li>
@@ -43,7 +52,7 @@
         Interface
       </div>-->
       <!-- Nav Item - Pages Collapse Menu -->
-      @include('menu.task')
+      @include('menu.menu')
       
       <!-- Divider -->
       <hr class="sidebar-divider">
@@ -119,14 +128,14 @@
             </li>
 
             <!-- Nav Item - Alerts -->
-            <li class="nav-item dropdown no-arrow mx-1">
+           <!-- <li class="nav-item dropdown no-arrow mx-1">
               <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-bell fa-fw"></i>
+                <i class="fas fa-bell fa-fw"></i>-->
                 <!-- Counter - Alerts -->
-                <span class="badge badge-danger badge-counter">3+</span>
-              </a>
+              <!--  <span class="badge badge-danger badge-counter">3+</span>
+              </a>-->
               <!-- Dropdown - Alerts -->
-              <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
+           <!--   <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
                 <h6 class="dropdown-header">
                   Alerts Center
                 </h6>
@@ -166,15 +175,17 @@
                 <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
               </div>
             </li>
-
+-->
             <!-- Nav Item - Messages -->
+<!--
             <li class="nav-item dropdown no-arrow mx-1">
               <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-envelope fa-fw"></i>
+                <i class="fas fa-envelope fa-fw"></i>-->
                 <!-- Counter - Messages -->
-                <span class="badge badge-danger badge-counter">7</span>
-              </a>
+             <!--   <span class="badge badge-danger badge-counter">7</span>
+              </a>-->
               <!-- Dropdown - Messages -->
+              <!--
               <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="messagesDropdown">
                 <h6 class="dropdown-header">
                   Message Center
@@ -222,14 +233,14 @@
                 <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
               </div>
             </li>
-
+-->
             <div class="topbar-divider d-none d-sm-block"></div>
 
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ $fullName }}</span>
-                <img class="img-profile rounded-circle" src="{{ asset('img/perfil/60x60/'.$cuentaUsuario.'.jpg') }}">
+                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ auth()->user()->name.' '.auth()->user()->ap_paterno }}</span>
+                <img class="img-profile rounded-circle" src="{{ asset('img/perfil/60x60/'.auth()->user()->cuenta_usuario.'.jpg') }}">
               </a>
               <!-- Dropdown - User Information -->
               <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
@@ -248,7 +259,7 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Logout
+                  Cerrar sesión
                 </a>
               </div>
             </li>
@@ -260,48 +271,7 @@
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
-
-          <!-- Page Heading -->
-          <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">xxxDashboard</h1>
-            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-          </div>
-
-          <!-- Content Row -->
-          <div class="row">
-
-           
-          </div>
-
-          <!-- Content Row -->
-
-          <div class="row">
-
-            
-          </div>
-
-          <!-- Content Row -->
-          <div class="row">
-
-            <!-- Content Column -->
-            <div class="col-lg-6 mb-4">
-
-             
-
-              <!-- Color System -->
-              <div class="row">
-                
-              </div>
-
-            </div>
-
-            <div class="col-lg-6 mb-4">
-
-              
-
-            </div>
-          </div>
-
+             @yield('content')
         </div>
         <!-- /.container-fluid -->
 
@@ -364,18 +334,73 @@
   </div>
 
       <!-- Scripts -->
-      <script src="{{ asset('js/app.js') }}"></script>
+     <!-- <script src="{{ asset('js/app.js') }}"></script>-->
       <!-- Bootstrap core JavaScript-->
-      <script src="{{ asset('vendor/jquery/jquery.js') }}"></script>
-      <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.js') }}"></script>
+
+      
+      <!--<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>-->
+      <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
       <!-- Core plugin JavaScript-->
-      <script src="{{ asset('vendor/jquery-easing/jquery.easing.js') }}"></script>
+      <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
       <!-- Custom scripts for all pages-->
-      <script src="{{ asset('js/sb-admin-2.js') }}"></script>
+      <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
       <!-- Page level plugins -->
       <script src="{{ asset('vendor/chart.js/Chart.js') }}"></script>
       <!-- Page level custom scripts -->
-      <script src="{{ asset('js/demo/chart-area-demo.js') }}"></script>
-      <script src="{{ asset('js/demo/chart-pie-demo.js') }}"></script>
+      <!--<script src="{{ asset('js/demo/chart-area-demo.js') }}"></script>
+      <script src="{{ asset('js/demo/chart-pie-demo.js') }}"></script>-->
+<!-- Latest compiled and minified JavaScript -->
+      <script src="{{ asset('bootstrap/dist/js/bootstrap.min.js') }}"></script>
+
+      <!-- Page level plugins -->
+      <script src="{{ asset('vendor/datatables/jquery.dataTables.min.js') }}"></script>
+
+      <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+      $('#dataTable').DataTable(
+          {
+             language: {
+
+              "decimal":        "",
+              "emptyTable":     "No exiten datos disponibles",
+              "info":           "Mostrando _START_ a _END_ de _TOTAL_ registros",
+              "infoEmpty":      "Mostrando 0 a 0 de 0 registros",
+              "infoFiltered":   "(Filtrado from _MAX_ total registros)",
+              "infoPostFix":    "",
+              "thousands":      ",",
+              "lengthMenu":     "Mostrar _MENU_ registros",
+              "loadingRecords": "Cargando...",
+              "processing":     "Procesando...",
+              "search":         "Buscar:",
+              "zeroRecords":    "No existen registros",
+
+              "paginate": {
+                  "first":      "Primero",
+                  "last":       "Después",
+                  "next":       "Próximo",
+                  "previous":   "Antes"
+              }
+        },
+          "aria": {
+              "sortAscending":  ": activate to sort column ascending",
+              "sortDescending": ": activate to sort column descending"
+          }
+  }
+
+
+        );
+  });
+  
+  $(document).on("click", ".iddelete", function () {
+     var myfile = $(this).data('id');
+     $(".modal-body #idAdjunto").val( myfile );
+   
+  });
+
+</script>
+
 </body>
 </html>

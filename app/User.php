@@ -27,7 +27,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
-
+    
+    public function importantTask(){
+        return $this->hasMany('App\ImportantTask', 'id_requerimiento');
+    }
 
     public function roles()
     {
@@ -37,7 +40,7 @@ class User extends Authenticatable
     }
 
     public function authorizeRoles($roles)
-    {
+    { 
         if ($this->hasAnyRole($roles)) {
             return true;
         }

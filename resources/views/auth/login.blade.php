@@ -51,7 +51,7 @@
                 <div class="p-5">
                   <div class="text-center">
                     <h1 class="h4 text-gray-900 mb-4">
-                         Bienvenidos al sistema de Requerimientos!cccc
+                         Bienvenidos al sistema de Requerimientos!
                     </h1>
                   </div>
                    <form class="form-horizontal" method="POST" action="{{ route('login') }}">
@@ -83,7 +83,7 @@
                       </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-user btn-block">
-                        Login
+                        Iniciar Sesión
                     </button>
                   </form>
                   <hr>
@@ -104,8 +104,6 @@
     </div>
     @endguest
 </div>
-
-
 
 </body>
 </html>
