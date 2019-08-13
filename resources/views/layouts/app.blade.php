@@ -22,9 +22,42 @@
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet" type="text/css">
   <!-- Custom styles for this page -->
    <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}"  rel="stylesheet" type="text/css">
+   <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+  <script type="text/javascript">
+     var i = 0;
+    function makeProgress(){
+        if(i < 100){
+            i = i + 2;
+            $(".progress-bar").css("width", i + "%").text(i + " %");
+        }
+        // Wait for sometime before running this script again
+        setTimeout("makeProgress()", 100);
+    }
+    window.onload = makeProgress();
+  </script>
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+function tiempo(){
+  for (num=0;num<=10;num++) {
+        var date1 = new Date();
+        var milisegundos1 = date1.getTime();
+        //alert('obteniendo el tiempo entre alert y alert');
+        var date2 = new Date();
+        var milisegundos2 = date2.getTime();
+        var diff_mseg = milisegundos2 - milisegundos1;
+       // document.getElementById('ms').innerHTML += 'bucle ' + num + ': ' + diff_mseg + ' milisegundos<br \/>';
+  }
+}
+window.onload = tiempo;
+//]]>
+</script>
 
 </head>
 <body id="page-top">
+    <div id="ms"></div>
    <!-- Page Wrapper -->
   <div id="wrapper">
         
@@ -357,6 +390,8 @@
 
       <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
+      <script src="{{ asset('js/dataTableAll.js') }}"></script>
+
 <script type="text/javascript">
 
   $(document).ready(function() {
@@ -400,7 +435,7 @@
    
   });
 
-</script>
+ </script>
 
 </body>
 </html>

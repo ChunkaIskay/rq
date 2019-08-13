@@ -56,7 +56,7 @@ es: "Elegir"
       @endif
 
   <!-- Page Heading -->
-  <h1 class="h3 mb-2 text-gray-800">Requerimentos Pendientes</h1>
+  <h1 class="h3 mb-2 text-gray-800">Cambiar prioridad a requerimientos</h1>
   <p class="mb-4">Detalle del requerimiento. </p>
 
   <!-- DataTales Example -->
@@ -65,7 +65,7 @@ es: "Elegir"
       <h6 class="m-0 font-weight-bold text-primary">Datos del Requerimiento</h6>
     </div>
     <div class="card-body">
-      <form  class="md-form" id="logout-form2" action="{{ url('/JefeOperaciones/'.$detalle[0]->id_requerimiento .'/rq-actualizar') }}" method="post" enctype="multipart/form-data">
+      <form  class="md-form" id="logout-form3" action="{{ url('/JefeOperaciones/'.$detalle[0]->id_requerimiento .'/rq-prioridad-actualizar') }}" method="post" enctype="multipart/form-data">
          {{ csrf_field() }}
           <div class="row">
                 <div class="col-lg-3">  
@@ -91,14 +91,7 @@ es: "Elegir"
                 <div class="col-lg-3">  
                     Prioridad
                 </div>
-
-                 <div class="col-lg-3 text-left">
-                  <select class="form-control"  name="prioridad" required="">
-                     @foreach($arrayPrioridad as $keyp => $vprioridad) 
-                              <option value="{{ $keyp }}" @if( $keyp == old('prioridad', $detalle[0]->prioridad )) selected @endif>{{ $vprioridad }}</option>
-                     @endforeach
-                  </select>
-                </div>
+                 <div class="col-lg-3 text-left"> <strong>{{ $detalle[0]->prioridad }}</strong></div>
           </div>
           <div class="row">
                 <div class="col-lg-3">  
@@ -164,13 +157,31 @@ es: "Elegir"
                    <strong>{{ $detalle[0]->nombre }}</strong>
                 </div>
           </div>
+          <div class="row">
+                <div class="col-lg-2">  
+                    Prioridad
+                </div>
+                 <div class="col-lg-2 text-left"> 
+                  <select class="form-control"  name="prioridad" required="">
+                     @foreach($arrayPrioridad as $keyp => $vprioridad) 
+                              <option value="{{ $keyp }}" @if(  $keyp == old('prioridad', $detalle[0]->prioridad )) selected @endif>{{ $vprioridad }}</option>
+                     @endforeach
+                  </select>
+                </div>
+                <div class="col-lg-2">  
+                   Observación
+                </div>
+                <div class="col-lg-6 text-left">  
+                   <strong><textarea class="form-control" rows="3" id="desc_obs" placeholder="Motivo del cambio. Solo si es criterio Suspendido." name="desc_obs"></textarea></strong>
+                </div>
+          </div>
             <br>
           <div class="row">
                 <div class="col-lg-3">  
                   Descripción
                 </div>
                 <div class="col-lg-9 text-left">
-                <textarea class="form-control" rows="3" id="descripcion" placeholder="Modifique la descripcion" name="descripcion">{{ $detalle[0]->descripcion }}</textarea>  
+                <textarea class="form-control" rows="5" id="descripcion" placeholder="Modifique la descripcion" name="descripcion" disabled="">{{ $detalle[0]->descripcion }}</textarea>  
                    <strong></strong>
                 </div>
           </div> <br>
@@ -179,12 +190,12 @@ es: "Elegir"
                    Resultado Deseado
                 </div>
                 <div class="col-lg-9 text-left">
-                 <textarea class="form-control" rows="3" id="desc_deseado" placeholder="Modifique el resultado deseado" name="desc_deseado">{{ $detalle[0]->resultado }}</textarea>  
+                 <textarea class="form-control" rows="4" id="desc_deseado" placeholder="Modifique el resultado deseado" name="desc_deseado" disabled="">{{ $detalle[0]->resultado }}</textarea>  
                    <strong></strong>
                 </div>
           </div>
           <br>
-          @include('jefe_operaciones.listado_adjunto')
+
           <br>
           <div class="row">
             <div class="col-lg-6 text-right">  
@@ -199,8 +210,6 @@ es: "Elegir"
             <div class="col-lg-6"> 
                <div class="my-2"></div>
                <a class="btn btn-primary" href="{{ route('examinarList') }}">
-                  
-
                 <span class="icon text-white-50">
                   <i class="fas fa-exclamation-triangle"></i>
                 </span>
@@ -211,11 +220,8 @@ es: "Elegir"
           </form>
       </div>
     </div>
-      
     </div>
-      
   </div>
-       
 </div>
         <!-- /.container-fluid -->
   <!-- Logout Modal-->
@@ -223,19 +229,19 @@ es: "Elegir"
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Esta seguro de modificar el requerimiento.</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Esta seguro de cambiar la prioridad?</h5>
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">x</span>
           </button>
         </div>
-        <div class="modal-body">Usted modificará el req. {{ $detalle[0]->id_requerimiento }}.</div>
+        <div class="modal-body">Usted modificará la prioridad del requerimiento, {{ $detalle[0]->id_requerimiento }}.</div>
         <div class="modal-footer">
           <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
           <!--<a class="btn btn-primary" href="login.html">Logout</a>-->
               <a class="btn btn-primary" href="{{ route('logout') }}"
                   onclick="event.preventDefault();
-                           document.getElementById('logout-form2').submit();">
-                  Modificar Requerimiento
+                           document.getElementById('logout-form3').submit();">
+                  Modificar prioridad
               </a>
         </div>
       </div>

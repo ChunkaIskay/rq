@@ -44,14 +44,54 @@ Route::get('/home',  array(	'as' => 'menuRol',	'middleware' => 'auth',	'uses' =>
 	Route::get('/{id}/rq-examinar-detalle', 'ImportantTasksController@rqExaminarDetalle')->name('examinarDetalle');	
 	//editar
 	Route::get('/{id}/rq-modificar','ImportantTasksController@rqEditar')->name('requerimientoEdit');
-	//modificar
+	//actulizar
 	Route::post('/{id}/rq-actualizar','ImportantTasksController@rqActualizar')->name('requermientoActualizar');
 	//lista
 	Route::get('/rq-reasignar-listado','ImportantTasksController@rqReasignarList')->name('rqReasignar');
 	//editar
 	Route::get('/{id}/rq-reasignar-editar','ImportantTasksController@rqReasignarEditar')->name('reasignarEditar');
-	//modificar
+	//actulizar
 	Route::post('/{id}/rq-reasignar-actualizar','ImportantTasksController@rqReasignarActualizar')->name('requermientoActualizar');
+
+	//lista
+	Route::get('/rq-prioridad-listado','ImportantTasksController@rqPrioridadListado')->name('rqPrioridadList');
+	//editar
+	Route::get('/{id}/rq-prioridad-editar','ImportantTasksController@rqPrioridadEditar')->name('prioridadEditar');
+	//actulizar
+	Route::post('/{id}/rq-prioridad-actualizar','ImportantTasksController@rqPrioridadActualizar')->name('prioridadEditar');
+
+	//lista all
+	Route::get('/rq-estado-all','ImportantTasksController@rqEstadoAll')->name('estadoAll');
+
+	Route::post('/rq-estado-all','ImportantTasksController@rqEstadoAll')->name('estadoAll');
+	//lista  asignados
+	Route::get('/rq-estado-all-asig','ImportantTasksController@rqEstadoAsig')->name('estadoAsig');
+	Route::post('/rq-estado-all-asig','ImportantTasksController@rqEstadoAsig')->name('estadoAsig');
+	//lista desarrollo
+	Route::get('/rq-estado-all-desa','ImportantTasksController@rqEstadoDesa')->name('estadoDesa');
+	Route::post('/rq-estado-all-desa','ImportantTasksController@rqEstadoDesa')->name('estadoDesa');
+	//lista Pruebas
+	Route::get('/rq-estado-all-pruebas','ImportantTasksController@rqEstadoPruebas')->name('estadoPruebas');
+	Route::post('/rq-estado-all-pruebas','ImportantTasksController@rqEstadoPruebas')->name('estadoPruebas');
+	//lista Instalación
+	Route::get('/rq-estado-all-inst','ImportantTasksController@rqEstadoInst')->name('estadoInst');
+	Route::post('/rq-estado-all-inst','ImportantTasksController@rqEstadoInst')->name('estadoInst');
+	//lista certificado
+	Route::get('/rq-estado-all-cert','ImportantTasksController@rqEstadoCert')->name('estadoCert');
+	Route::post('/rq-estado-all-cert','ImportantTasksController@rqEstadoCert')->name('estadoCert');
+
+	//lista seguimiento
+	Route::get('/rq-seguimiento','ImportantTasksController@rqSeguimiento')->name('seguimiento');
+	Route::post('/rq-seguimiento','ImportantTasksController@rqSeguimiento')->name('seguimiento');
+    //destalle seguimiento
+    Route::get('/{id}/rq-seguimiento','ImportantTasksController@rqSegtoDetalle')->name('seguimientoDetalle');
+    // download seguimiento genrico
+    Route::get('/{id}/download-seg/','ImportantTasksController@downloadSeg')->name('downloadFileSeg');
+	//Route::get('/search-contract', array('as' => 'searchContract','middleware' => 'auth',	'uses' => 'OperationalManagementController@search'));
+
+	//Route::post('/search-contract', array('as' => 'searchList','middleware' => 'auth',	'uses' => 'OperationalManagementController@search'));
+
+
 
 });
 

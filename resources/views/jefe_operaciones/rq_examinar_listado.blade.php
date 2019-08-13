@@ -15,9 +15,12 @@
                 </div>
             @endif
           <!-- Page Heading -->
-          <h1 class="h3 mb-2 text-gray-800">Examinar Requerimientos</h1>
+          <h1 class="h3 mb-2 text-gray-800">{{ $pagTitulo }}</h1>
           <p class="mb-4">Tiene el listado completo de los requerimientos.</p>
-
+          <!-- progress bar -->
+          <div class="progress">
+              <div class="progress-bar progress-bar-striped" style="min-width: 20px;"></div>
+          </div>
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -49,11 +52,20 @@
                       <td>{{ $value->prioridad }}</td>
                       <td>{{ $value->accesible }}</td>
                       <td class="td-actions text-left">
-                                <a href="{{ url('/JefeOperaciones/'.$value->id_requerimiento.'/rq-examinar-detalle') }}" type="button" rel="tooltip" title="Ver detalle" class="btn btn-success btn-simple btn-xs">
-                                <i class="fa fa-eye"></i></a>
-                                <a href="{{ url('/JefeOperaciones/'.$value->id_requerimiento.'/rq-modificar') }}" type="button" rel="tooltip" title="Editar Req." class="btn btn-info btn-simple btn-xs">
-                                <i class="far fa-edit"></i>
-                               </a>
+                      @if($pag == 'prioridad')
+                          <a href="{{ url('/JefeOperaciones/'.$value->id_requerimiento.'/rq-prioridad-editar') }}" 
+                                type="button" rel="tooltip" title="Editar Req." class="btn btn-info btn-simple btn-xs">
+                          <i class="far fa-edit"></i>
+                          </a>
+                            
+                      @else
+                          <a href="{{ url('/JefeOperaciones/'.$value->id_requerimiento.'/rq-examinar-detalle') }}" type="button" rel="tooltip" title="Ver detalle" class="btn btn-success btn-simple btn-xs">
+                          <i class="fa fa-eye"></i></a>
+                          <a href="{{ url('/JefeOperaciones/'.$value->id_requerimiento.'/rq-modificar') }}" 
+                                type="button" rel="tooltip" title="Editar Req." class="btn btn-info btn-simple btn-xs">
+                           <i class="far fa-edit"></i>
+                           </a>
+                      @endif
                       </td>
                   </tr> 
                 @endforeach
