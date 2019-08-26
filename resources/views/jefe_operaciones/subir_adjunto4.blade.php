@@ -10,20 +10,18 @@
       <div class="card-body">
         <div class="list-group">
           <br>  
-
-            @if(!empty($adjuntos))
-              @foreach($adjuntos as $key => $value) 
+             @if(!empty($adjuntosDesa))
+              @foreach($adjuntosDesa as $keyd => $valued) 
                <div class="row">
                   <div class="col-lg-11 text-left"> 
-                    <a href="{{ route('downloadFileSeg', $value->id_adjunto)  }}?ide={{ $value->id_etapa }}"  class="list-group-item list-group-item-info">{{ $value->nombre }}
+                    <a href="{{ route('downloadFileSeg', $valued->id_adjunto)  }}?ide={{ $valued->id_etapa }}"  class="list-group-item list-group-item-info">{{ $valued->nombre }}
                     </a>
                     <br>
                   </div>
                </div>
               @endforeach
             @endif
-             
-        </div>
+            </div>
       </div>
     </div>
 </div>

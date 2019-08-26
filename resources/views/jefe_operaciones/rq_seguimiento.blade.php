@@ -16,12 +16,12 @@
             @endif
           <!-- Page Heading -->
           <h1 class="h3 mb-2 text-gray-800">Seguimiento de Requerimentos.</h1>
-          <p class="mb-4">Seleccione un requerimiento, para ver la fase en el cual se encuetra. </p>
+          <p class="mb-4">Busque el requerimiento deseado, para ver la fase en la se encuentra. </p>
 
           <!-- DataTales Example -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">Seleccione el requermiento y luego presione el boton seguimiento</h6>
+              <h6 class="m-0 font-weight-bold text-primary">Lista de requerimientos.</h6>
             </div>
 
             <div class="card-body">

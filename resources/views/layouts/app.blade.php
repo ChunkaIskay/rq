@@ -9,8 +9,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Bienvenidos al sistema de Requerimientos!<!--{{ config('app.name', 'Bienvenidos al sistema de Requerimientos!') }}--></title>
+    
     <!-- Custom fonts for this template-->
-
     <script src="{{ asset('js/jquery/jquery-3.4.1.min.js') }}"></script>
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
      <!-- Custom fonts for this template -->
@@ -23,6 +23,7 @@
   <!-- Custom styles for this page -->
    <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}"  rel="stylesheet" type="text/css">
    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+
   <script type="text/javascript">
      var i = 0;
     function makeProgress(){
@@ -434,7 +435,9 @@ window.onload = tiempo;
      $(".modal-body #idAdjunto").val( myfile );
    
   });
-
+ 
+  
+ 
  </script>
 
 </body>

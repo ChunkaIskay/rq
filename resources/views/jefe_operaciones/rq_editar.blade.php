@@ -199,8 +199,6 @@ es: "Elegir"
             <div class="col-lg-6"> 
                <div class="my-2"></div>
                <a class="btn btn-primary" href="{{ route('examinarList') }}">
-                  
-
                 <span class="icon text-white-50">
                   <i class="fas fa-exclamation-triangle"></i>
                 </span>
@@ -211,13 +209,10 @@ es: "Elegir"
           </form>
       </div>
     </div>
-      
     </div>
-      
   </div>
-       
 </div>
-        <!-- /.container-fluid -->
+  <!-- /.container-fluid -->
   <!-- Logout Modal-->
   <div class="modal fade" id="modalActualizar" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">

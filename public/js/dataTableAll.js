@@ -332,4 +332,35 @@
           }
       });
 
+      $('#dataTablePend').DataTable(
+      {
+             language: {
+
+              "decimal":        "",
+              "emptyTable":     "No exiten datos disponibles",
+              "info":           "Mostrando _START_ a _END_ de _TOTAL_ registros",
+              "infoEmpty":      "Mostrando 0 a 0 de 0 registros",
+              "infoFiltered":   "(Filtrado from _MAX_ total registros)",
+              "infoPostFix":    "",
+              "thousands":      ",",
+              "lengthMenu":     "Mostrar _MENU_ registros",
+              "loadingRecords": "Cargando...",
+              "processing":     "Procesando...",
+              "search":         "Buscar:",
+              "zeroRecords":    "No existen registros",
+
+              "paginate": {
+                  "first":      "Primero",
+                  "last":       "Después",
+                  "next":       "Próximo",
+                  "previous":   "Antes"
+              }
+        },
+          "aria": {
+              "sortAscending":  ": activate to sort column ascending",
+              "sortDescending": ": activate to sort column descending"
+          }
+      });
+
+
   });

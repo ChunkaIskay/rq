@@ -11,18 +11,18 @@
         <div class="list-group">
           <br>  
 
-            @if(!empty($adjuntos))
-              @foreach($adjuntos as $key => $value) 
+            @if(!empty($adjuntosCert))
+              @foreach($adjuntosCert as $keyc => $valuec) 
                <div class="row">
                   <div class="col-lg-11 text-left"> 
-                    <a href="{{ route('downloadFileSeg', $value->id_adjunto)  }}?ide={{ $value->id_etapa }}"  class="list-group-item list-group-item-info">{{ $value->nombre }}
+                    <a href="{{ route('downloadFileSeg', $valuec->id_adjunto)  }}?ide={{ $valuec->id_etapa }}"  class="list-group-item list-group-item-info">{{ $valuec->nombre }}
                     </a>
                     <br>
                   </div>
                </div>
               @endforeach
             @endif
-             
+          
         </div>
       </div>
     </div>

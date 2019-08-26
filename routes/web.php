@@ -91,6 +91,20 @@ Route::get('/home',  array(	'as' => 'menuRol',	'middleware' => 'auth',	'uses' =>
 
 	//Route::post('/search-contract', array('as' => 'searchList','middleware' => 'auth',	'uses' => 'OperationalManagementController@search'));
 
+    //listado de rq pendientes
+	Route::get('/rq-lista-pendientes','ImportantTasksController@rqListaPendientes')->name('listaPendintes');
+	Route::post('/rq-lista-pendientes','ImportantTasksController@searchReqPendientes')->name('searchRqPendientes');
+	//Cliente
+	Route::get('/lista-clientes','SpecialTasksController@listaClientes')->name('listaClientes');
+	//Cliente nuevo
+	Route::get('/nuevo-cliente','SpecialTasksController@nuevoCliente')->name('nuevoCliente');
+	Route::post('/guardar-cliente','SpecialTasksController@guardarCliente')->name('guardarCliente');
+	//CLiente modificar
+	Route::get('/{id}/modificar-cliente','SpecialTasksController@modificarCliente')->name('modificarCliente');
+	Route::post('/{id}/editar-cliente','SpecialTasksController@editarCliente')->name('editarCliente');
+	
+
+
 
 
 });

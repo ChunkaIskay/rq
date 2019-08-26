@@ -4,16 +4,11 @@ namespace App\Http\Controllers\jefeOperaciones;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
-
 use App\Http\Requests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
 use Symfony\Component\HttpFoundation\Response;
-//use Illuminate\Pagination\Paginator;
-//use App\ImportantTask;
-//use App\Http\Controllers\MenuRolController;
+
 use App\AprobacionRq;
 use App\Requerimiento;
 use App\Adjunto;
@@ -884,13 +879,41 @@ class ImportantTasksController extends Controller
 				 'users.name','users.ap_paterno','tb_cliente.nombre')
 		->get();
 
-		$adjuntosIni= $this->adjuntoArchivos($id, 1);
+		$adjuntos = $this->adjuntoArchivos($id, 1);
 		
-		$arrayEstado = array();
+		// 1 si se ejecuto correctamente la consulta. 0 si no trae datos (datos vacios)
+		$arrayEstado = array('inicio_req'=>100,
+							 'aprobacion'=>100,
+							 'asignacion'=>100,
+							 'desarrollo'=>100,
+							 'prueba'=>100,
+							 'certificacion'=>100,
+							 'instalacion_asig'=>100,
+							 'instalacion'=>100,
+							 'cert_on_line'=>100,
+							 'control_svn'=>100,
+							 'aceptacion_cliente'=>100
+							);
+		// face actual = 1 ,  no llego a esa fase =0, ya paso por esa fase = 2,'Rm' Rq depurado = 3, Ob Rq rechazado por el auditor = 4
+		$faseActual = array('inicio_req'=> 0,
+							 'aprobacion'=> 0,
+							 'asignacion'=> 0,
+							 'desarrollo'=> 0,
+							 'prueba'=> 0,
+							 'certificacion'=> 0,
+							 'instalacion_asig'=> 0,
+							 'instalacion'=> 0,
+							 'cert_on_line'=> 0,
+							 'control_svn'=> 0,
+							 'aceptacion_cliente'=> 0
+							);
 
 		// fase aprobacion
 		if($detalle[0]->accesible == 'No'){
-			
+
+			$arrayEstado['inicio_req'] = 1;
+			$faseActual['inicio_req'] = 2;
+
 			$aprobacion = $this->aprobacionSeg($id);
 
 			if($aprobacion){
@@ -901,6 +924,7 @@ class ImportantTasksController extends Controller
 
 			// fase de asignación
 			if($aprobacion->accesible == 'No'){
+				$faseActual['aprobacion'] = 2;
 				$asignacion = $this->asignacionSeg($id);
 
 				if($asignacion){
@@ -911,10 +935,11 @@ class ImportantTasksController extends Controller
 
 				// fase de desarrollo
 				if($asignacion[0]->accesible == 'No' && !empty($asignacion[0]->Nro_asignacion)){
+					$faseActual['asignacion'] = 2;
 					$desarrollo = $this->desarrolloSeg($asignacion[0]->Nro_asignacion);
 
 					if($desarrollo){
-						$adjuntosDesa= $this->adjuntoArchivos($id, 4);
+						$adjuntosDesa = $this->adjuntoArchivos($id, 4);
 						$arrayEstado['desarrollo'] = 1;
 					}else{
 						$arrayEstado['desarrollo'] = 0;
@@ -926,13 +951,14 @@ class ImportantTasksController extends Controller
 	                $idSolu = $desarrollo[0]->id_solucion;
 	             
 					if($desarrollo[0]->accesible == 'No'){
+						$faseActual['desarrollo'] = 2;
 						$prueba = $this->pruebaSeg($idSolu,$fechaFin,$horaFin);
 
 						if($prueba){
 
 							$adjuntosPrue= $this->adjuntoArchivos($id, 0);
 							$arrayEstado['prueba'] = 1;
-						}else{
+						}else{ 	
 							$arrayEstado['prueba'] = 0;
 						}
 
@@ -950,27 +976,28 @@ class ImportantTasksController extends Controller
 						// fase de instalacion
 						$idSolu = $certificacion[0]->id_solucion;
 						if($certificacion[0]->accesible == 'No'){
-
+							$faseActual['prueba'] = 2;
 							$instalacionAsig = $this->instalacionAsigSeg($idSolu);
-
+							$instalacionRqSeg = $this->instalacionRqSeg($idSolu);
+						
 							if($instalacionAsig){
-
-								$adjuntosInsAsig= $this->adjuntoArchivos($id, 0);
-								$arrayEstado['instalacionAsig'] = 1;
+								$adjuntosInsAsig = $this->adjuntoArchivos($id, 0);
+								$arrayEstado['instalacion_asig'] = 1;
+								$faseActual['instalacion'] = 1;
 							}else{
-								$arrayEstado['instalacionAsig'] = 0;
+								$arrayEstado['instalacion_asig'] = 0;
 							}
 
-							// Significa que ya ha sido instalado luego de la asignacion a instalacion
+							// si instalacionAsig[0]->accesible es NO significa que ya ha sido instalado luego de la asignacion a instalacion
 
-							if($instalacionAsig[0]->accesible == 'No'){
-
+							if($instalacionAsig[0]->accesible == 'No'){ 
+								//$faseActual['instalacion_asig'] = 2;
 								$instalacion = $this->instalacionSeg($instalacionAsig[0]->id_asig_instal);
 
-								if($instalacion){
-
+								if($instalacion){ 
 									$adjuntosInsta = $this->adjuntoArchivos($id, 7);
 									$arrayEstado['instalacion'] = 1;
+									$faseActual['instalacion'] = 1;
 								}else{
 									$arrayEstado['instalacion'] = 0;
 								}
@@ -981,9 +1008,13 @@ class ImportantTasksController extends Controller
 
 								if($certOnLine){
 									$adjuntosCeOnLine = $this->adjuntoArchivos($id, 8);
-									$arrayEstado['certOnLine'] = 1;
+									$arrayEstado['cert_on_line'] = 1;
+									$faseActual['cert_on_line'] = 1;  
+									if(!empty($instalacion[0]->fecha_instal)){
+										$faseActual['instalacion'] = 2;
+									}
 								}else{
-									$arrayEstado['certOnLine'] = 0;
+									$arrayEstado['cert_on_line'] = 0;
 								}
 
 								// fase de control de SVN
@@ -991,117 +1022,175 @@ class ImportantTasksController extends Controller
 
 								if($controlSvn){
 									//$adjuntosCSvn = $this->adjuntoArchivos($id, 8);
-									$arrayEstado['controlSvn'] = 1;
-								}else{
-									$arrayEstado['controlSvn'] = 0;
-								}
+									$arrayEstado['control_svn'] = 1;
+									$faseActual['control_svn'] = 1;
 
-								// fase de aceptacion del cliente
-								$aceptacionCliente = $this->aceptacionCliSeg($idInstalacion);
+									if(!empty($controlSvn[0]->fecha_subversion)){
+										$faseActual['cert_on_line'] = 2;
+									}
+									// fase de aceptacion del cliente
+									$aceptacionCliente = $this->aceptacionCliSeg($controlSvn[0]->id_control_svn);
 
-								if($aceptacionCliente){
-									$adjuntosAcepCliente = $this->adjuntoArchivos($id, 10);
-									$arrayEstado['aceptacionCliente'] = 1;
+									if($aceptacionCliente){
+										$arrayEstado['aceptacion_cliente'] = 1;
+										$faseActual['aceptacion_cliente'] = 1;
+
+										if(!empty($aceptacionCliente[0]->fecha_aceptacion)){
+											$faseActual['control_svn'] = 2;
+										}
+										if(!empty($aceptacionCliente[0]->id_aceptacion)){
+											$faseActual['aceptacion_cliente'] = 2;
+										}
+									}else{
+										$arrayEstado['aceptacion_cliente'] = 0;
+									}
+
 								}else{
-									$arrayEstado['aceptacionCliente'] = 0;
+									$arrayEstado['control_svn'] = 0;
 								}
 
 							}else{
-								$arrayEstado['instalacion'] = 0;
-			
+									if($instalacionAsig[0]->accesible == 'Si')
+										$faseActual['instalacion'] = 1;
+									//$arrayEstado['instalacion'] = 0;
 							}
 
-						}else{
-							$arrayEstado['instalacionAsig'] = 0;
+						}else{  // certificacion y prueba
+								if($certificacion[0]->accesible == 'Si')
+									$faseActual['certificacion'] = 1;
+								//$arrayEstado['instalacion_asig'] = 0;
+								$arrayEstado['instalacion'] = 0;
 						}
 
 					}else{
-						$arrayEstado['prueba'] = 0;
+							if($desarrollo[0]->accesible == 'Si')
+								$faseActual['desarrollo'] = 1;
+
+							$arrayEstado['prueba'] = 0;
 					}
 
 				}else{
-					$arrayEstado['desarrollo'] = 0;
+						if($asignacion[0]->accesible == 'Si')
+							$faseActual['asignacion'] = 1;
+
+						$arrayEstado['desarrollo'] = 0;
 				}
 	
 			}else{
-				$arrayEstado['asignacion'] = 0;
+					if($aprobacion->accesible == 'Si')
+						$faseActual['aprobacion'] = 1;
+
+					$arrayEstado['asignacion'] = 0;
 			}
 
 		}else{
-			$arrayEstado['aprobacion'] = 0;
+				if($detalle[0]->accesible == 'Si')
+					$faseActual['inicio_req'] = 1;
+
+				$arrayEstado['aprobacion'] = 0;
+				$arrayEstado['inicio_req'] = 0;
 		}
-		
+
 
 		//	$estado = (rechazaso, depurado, aprobado, en curso)
 		$arraycodFase = array(  'id_fase1' => 1, 
-								'id_fase2' => 2 ,
-								'id_fase3' => 3 ,
-								'id_fase4' => 4 ,
-								'id_fase5' => 5 ,
-								'id_fase6' => 6 ,
-								'id_fase7' => 7 ,
-								'id_fase8' => 8 );
+								'id_fase2' => 2,
+								'id_fase3' => 3,
+								'id_fase4' => 4,
+								'id_fase5' => 5,
+								'id_fase6' => 6,
+								'id_fase7' => 7,
+								'id_fase8' => 8,
+								'id_fase9' => 9,
+								'id_fase10' => 10 );
 		
-		$arratFases = array('inicio_req' => 
+		$arrayFases = array('inicio_req' => 
 									array('nom_fase' => 'Inicio Requerimiento',
+										  'desc_fase' => 'Inicia Requerimiento', 
 										  'id_requerimiento' => $id,
 										  'estado' => $arrayEstado['inicio_req'],
-										  'id_fase' => $arraycodFase['id_fase1']
+										  'id_fase' => $arraycodFase['id_fase1'],
+										  'fase_actual' => $faseActual['inicio_req']
 										),
 							'aprobacion' => 
-									array('nom_fase' => 'Fase de aprobación',
+									array('nom_fase' => 'Fase de Aprobación',
+										  'desc_fase' => 'Aprobación Opr.',
 										  'id_requerimiento' => $id,
 										  'estado' => $arrayEstado['aprobacion'],
-										  'id_fase' => $arraycodFase['id_fase2']
+										  'id_fase' => $arraycodFase['id_fase2'],
+										  'fase_actual' => $faseActual['aprobacion']
 										),
 							'asignacion' => 
-									array('nom_fase' => 'Fase de asignación',
+									array('nom_fase' => 'Fase de Asignación',
+										  'desc_fase' => 'Asignación en Des.',
 										  'id_requerimiento' => $id,
 										  'estado' => $arrayEstado['asignacion'],
-										  'id_fase' => $arraycodFase['id_fase3']
+										  'id_fase' => $arraycodFase['id_fase3'],
+										  'fase_actual' => $faseActual['asignacion']
 										),
 							'desarrollo' => 
-									array('nom_fase' => 'Fase de desarrollo',
+									array('nom_fase' => 'Fase de Desarrollo',
+										  'desc_fase' => 'Desarrollo Req',
 										  'id_requerimiento' => $id,
 										  'estado' => $arrayEstado['desarrollo'],
-										  'id_fase' => $arraycodFase['id_fase4']
+										  'id_fase' => $arraycodFase['id_fase4'],
+										  'fase_actual' => $faseActual['desarrollo']
+
 										),
 							'prueba' => 
-									array('nom_fase' => 'Fase de prueba operador',
+									array('nom_fase' => 'Fase de Prueba Opr.',
+										  'desc_fase' => 'Prueba Opr',
 										  'id_requerimiento' => $id,
 										  'estado' => $arrayEstado['prueba'],
-										  'id_fase' => $arraycodFase['id_fase5']
+										  'id_fase' => $arraycodFase['id_fase5'],
+										  'fase_actual' => $faseActual['prueba']
 										),
 							'certificacion' => 
-									array('nom_fase' => 'Fase de certificación',
+									array('nom_fase' => 'Fase de Certificación',
+										  'desc_fase' => 'Desarrollo Asignación Instalación.',
 										  'id_requerimiento' => $id,
 										  'estado' => $arrayEstado['certificacion'],
-										  'id_fase' => $arraycodFase['id_fase6']
+										  'id_fase' => $arraycodFase['id_fase6'],
+										  'fase_actual' => $faseActual['prueba']
 										),
 							'instalacion' => 
-									array('nom_fase' => 'Fase de instalación',
+									array('nom_fase' => 'Fase de Instalación',
+										  'desc_fase' => 'Instalación por Des.',
 										  'id_requerimiento' => $id,
 										  'estado' => $arrayEstado['instalacion'],
-										  'id_fase' => $arraycodFase['id_fase7']
+										  'id_fase' => $arraycodFase['id_fase7'],
+										  'fase_actual' => $faseActual['instalacion']
 										),
 							'cert_online' => 
-									array('nom_fase' => 'Fase de certificación on line',
+									array('nom_fase' => 'Fase de Certificación Online',
+										  'desc_fase' => 'Certificación Online Opr',
 										  'id_requerimiento' => $id,
-										  'estado' => $arrayEstado['certOnLine'],
-										  'id_fase' => $arraycodFase['id_fase8']
+										  'estado' => $arrayEstado['cert_on_line'],
+										  'id_fase' => $arraycodFase['id_fase8'],
+										  'fase_actual' => $faseActual['cert_on_line']
+										),
+							'control_version' => 
+									array('nom_fase' => 'Fase de Control de Svn',
+										  'desc_fase' => 'Control de Versión Des.',
+										  'id_requerimiento' => $id,
+										  'estado' => $arrayEstado['control_svn'],
+										  'id_fase' => $arraycodFase['id_fase9'],
+										  'fase_actual' => $faseActual['control_svn']
+										),
+							'aceptacion_cliente' => 
+									array('nom_fase' => 'Fase de Aceptación del Cliente',
+										  'desc_fase' => 'Aceptación cliente.',
+										  'id_requerimiento' => $id,
+										  'estado' => $arrayEstado['aceptacion_cliente'],
+										  'id_fase' => $arraycodFase['id_fase10'],
+										  'fase_actual' => $faseActual['aceptacion_cliente']
 										)
 							);
-		 
-
-		
-
 		//$pendInstalar = collect($pendInstalar1)->get();
-
 		//agregar nick del mètodo para subir y borrar archivos
-		$nombreFuncion = 'pendDetalle';
-		return view('jefe_operaciones.rq_seguimiento_detalle')->with(compact('detalle','adjuntos','nombreFuncion','arratFases','arraycodFase'));	
 
-			
+		$nombreFuncion = 'pendDetalle';
+		return view('jefe_operaciones.rq_seguimiento_detalle')->with(compact('detalle','adjuntos','nombreFuncion','arrayFases','arraycodFase','aprobacion','asignacion','desarrollo','prueba','certificacion','instalacionAsig','instalacionRqSeg','instalacion','certOnLine','adjuntosDesa','adjuntosPrue','adjuntosCert','adjuntosInsAsig','adjuntosInsta','adjuntosCeOnLine','adjuntosAcepCliente','controlSvn','aceptacionCliente'));	
 	}
 
 	public function downloadSeg(Request $request,$id){
@@ -1156,7 +1245,6 @@ class ImportantTasksController extends Controller
 		->select('id_solucion', 'id_asignacion','fecha_inicio','hora_inicio','fecha_fin','hora_fin','descripcion','accesible')
 		->get();
 
-
 		return $desaExiste;
 	
 	}
@@ -1186,10 +1274,10 @@ class ImportantTasksController extends Controller
 
 	public function certificacionSeg($id){
 
-		$certExiste = DB::select('SELECT tb_certificacion.id_certificacion,tb_certificacion.id_solucion,tb_certificacion.fecha_certificacion,tb_certificacion.hora_certificacion, tb_certificacion.detalle_certificacion, tb_certificacion.detalle_funcionalidades, users.name, users.ap_paterno 
+		$certExiste = DB::select('SELECT tb_certificacion.id_certificacion,tb_certificacion.id_solucion,tb_certificacion.fecha_certificacion,tb_certificacion.hora_certificacion, tb_certificacion.detalle_certificacion, tb_certificacion.detalle_funcionalidades, tb_certificacion.accesible, users.name, users.ap_paterno 
 			FROM tb_certificacion 
 			JOIN users on tb_certificacion.id_operador=users.id 
-			WHERE tb_certificacion.id_solucion=:id', ['id' => $idSolu]);
+			WHERE tb_certificacion.id_solucion=:id', ['id' => $id]);
 
 		return $certExiste;
 
@@ -1197,7 +1285,7 @@ class ImportantTasksController extends Controller
 
 	public function instalacionAsigSeg($id){
 
-		$instAsigExiste = DB::select('SELECT ag.id_asig_instal, ag.id_gestor, ag.id_solucion, ag.id_programador, ag.fecha_asig_instal, ag.hora_asig_instal, CONCAT(ag.name, " ", ag.ap_paterno) as asignado_por , CONCAT(us.name, " ", us.ap_paterno) as asignado_a
+		$instAsigExiste = DB::select('SELECT ag.id_asig_instal, ag.id_gestor, ag.id_solucion, ag.id_programador, ag.fecha_asig_instal, ag.hora_asig_instal, ag.accesible, CONCAT(ag.name, " ", ag.ap_paterno) as asignado_por , CONCAT(us.name, " ", us.ap_paterno) as asignado_a
 			 	FROM (
 			 	 SELECT * FROM tb_asignacion_instal_req sr 
 			 	 JOIN users u on sr.id_gestor = u.id 
@@ -1212,11 +1300,22 @@ class ImportantTasksController extends Controller
 
 	public function instalacionSeg($id){
 
-		$instExiste = DB::select('SELECT id_instalcion, id_asig_instal, backup, fecha_instal, hora_instal, comentario, accesible
+		$instExiste = DB::select('SELECT id_instalacion, id_asig_instal, backup, fecha_instal, hora_instal, comentario, accesible
 			FROM tb_instalacion 
 			WHERE id_asig_instal= :id', ['id' => $id]);
 
 		return $instExiste;
+
+	}
+
+	public function instalacionRqSeg($id){
+
+		$instRqExiste = DB::select('SELECT u.name, u.ap_paterno 
+			FROM tb_requerimiento r
+			JOIN users u on r.id_operador = u.id
+			WHERE  id_requerimiento = :id', ['id' => $id]);
+
+		return $instRqExiste;
 
 	}
 
@@ -1253,6 +1352,416 @@ class ImportantTasksController extends Controller
 
 		return $aceptacionExiste;
 
+	}
+
+
+	public function rqListaPendientes(){
+		
+	
+		$dateFrom = "";
+		$dateTo = "";
+		$rqPendientes = "";
+
+		return view('jefe_operaciones.rq_lista_pendientes')->with(compact('rqPendientes','dateFrom','dateTo'));
+
+	}
+
+	public function searchReqPendientes(Request $request){ 
+	
+		if(!empty($request->input('dateFrom')) && !empty($request->input('dateTo')) ){
+			$listarqPen = $this->listaPendDetalle($request->input('dateFrom'), $request->input('dateTo'));
+			
+			if($listarqPen){
+
+				$arrayListRqPen = $this->requerimientosPendientes($listarqPen);
+
+			}else{
+
+
+			}
+
+		}else{
+			//dd("las fechas son nullas");
+		}
+	
+
+		$dateFrom = $request->input('dateFrom');
+		$dateTo = $request->input('dateTo');
+   
+       	$rqPendientes = $arrayListRqPen;
+	
+       	return view('jefe_operaciones.rq_lista_pendientes')->with(compact('rqPendientes','dateFrom','dateTo'));
+	}
+
+	public function requerimientosPendientes($listaRq){ 	
+		$arrayP = array();
+		foreach ($listaRq as $key => $valuerq){
+		
+				$id = $valuerq->id_requerimiento;
+				// fase inicial 
+				$detalle = DB::table('tb_requerimiento')
+				->join('tb_cliente','tb_requerimiento.id_cliente', '=' , 'tb_cliente.id_cliente')
+				->join('users','tb_requerimiento.id_operador', '=' , 'users.id')
+				->where('tb_requerimiento.id_requerimiento', '=' , $id)
+				->select('id_requerimiento', 'tb_requerimiento.accesible')
+				->get();
+
+				// 1 si se ejecuto correctamente la consulta. 0 si no trae datos (datos vacios)
+				$arrayEstado = array('inicio_req'=>100,
+									 'aprobacion'=>100,
+									 'asignacion'=>100,
+									 'desarrollo'=>100,
+									 'prueba'=>100,
+									 'certificacion'=>100,
+									 'instalacion_asig'=>100,
+									 'instalacion'=>100,
+									 'cert_on_line'=>100,
+									 'control_svn'=>100,
+									 'aceptacion_cliente'=>100
+									);
+				// face actual = 1 ,  no llego a esa fase =0, ya paso por esa fase = 2,'Rm' Rq depurado = 3, Ob Rq rechazado por el auditor = 4
+				$faseActual = array('inicio_req'=> 0,
+									 'aprobacion'=> 0,
+									 'asignacion'=> 0,
+									 'desarrollo'=> 0,
+									 'prueba'=> 0,
+									 'certificacion'=> 0,
+									 'instalacion_asig'=> 0,
+									 'instalacion'=> 0,
+									 'cert_on_line'=> 0,
+									 'control_svn'=> 0,
+									 'aceptacion_cliente'=> 0
+									);
+
+				// fase aprobacion
+				if($detalle[0]->accesible == 'No'){
+
+					$arrayEstado['inicio_req'] = 1;
+					$faseActual['inicio_req'] = 2;
+
+					$aprobacion = $this->aprobacionSeg($id);
+
+					if($aprobacion){
+						$arrayEstado['aprobacion'] = 1;
+					}else{
+						$arrayEstado['aprobacion'] = 0;
+					}
+
+					// fase de asignación
+					if($aprobacion->accesible == 'No'){
+						$faseActual['aprobacion'] = 2;
+						$asignacion = $this->asignacionSeg($id);
+
+						if($asignacion){
+							$arrayEstado['asignacion'] = 1;
+						}else{
+							$arrayEstado['asignacion'] = 0;
+						}
+
+						// fase de desarrollo
+						if($asignacion[0]->accesible == 'No' && !empty($asignacion[0]->Nro_asignacion)){
+							$faseActual['asignacion'] = 2;
+							$desarrollo = $this->desarrolloSeg($asignacion[0]->Nro_asignacion);
+
+							if($desarrollo){
+								$arrayEstado['desarrollo'] = 1;
+							}else{
+								$arrayEstado['desarrollo'] = 0;
+							}
+
+							// fase de prueba OPR
+						    $fechaFin = $desarrollo[0]->fecha_fin;
+			                $horaFin = $desarrollo[0]->hora_fin;
+			                $idSolu = $desarrollo[0]->id_solucion;
+			             
+							if($desarrollo[0]->accesible == 'No'){
+								$faseActual['desarrollo'] = 2;
+								$prueba = $this->pruebaSeg($idSolu,$fechaFin,$horaFin);
+
+								if($prueba){
+									$arrayEstado['prueba'] = 1;
+								}else{ 	
+									$arrayEstado['prueba'] = 0;
+								}
+
+								// fase de certificaión
+								$certificacion = $this->certificacionSeg($idSolu);
+
+								if($certificacion){
+									$arrayEstado['certificacion'] = 1;
+								}else{
+									$arrayEstado['certificacion'] = 0;
+								}
+
+								// fase de instalacion
+								$idSolu = $certificacion[0]->id_solucion;
+								if($certificacion[0]->accesible == 'No'){
+									$faseActual['prueba'] = 2;
+									$instalacionAsig = $this->instalacionAsigSeg($idSolu);
+									$instalacionRqSeg = $this->instalacionRqSeg($idSolu);
+									
+									if($instalacionAsig){
+										$arrayEstado['instalacion_asig'] = 1;
+										$faseActual['instalacion'] = 1;
+									}else{
+										$arrayEstado['instalacion_asig'] = 0;
+									}
+
+									// si instalacionAsig[0]->accesible es NO significa que ya ha sido instalado luego de la asignacion a instalacion
+
+									if($instalacionAsig[0]->accesible == 'No'){ 
+										//$faseActual['instalacion_asig'] = 2;
+										$instalacion = $this->instalacionSeg($instalacionAsig[0]->id_asig_instal);
+
+										if($instalacion){ 
+											$arrayEstado['instalacion'] = 1;
+											$faseActual['instalacion'] = 1;
+										}else{
+											$arrayEstado['instalacion'] = 0;
+										}
+
+										// fase de certificacion On Line
+										$idInstalacion = $instalacion[0]->id_instalacion;
+										$certOnLine = $this->certOnLineSeg($idInstalacion);
+
+										if($certOnLine){
+											$arrayEstado['cert_on_line'] = 1;
+											$faseActual['cert_on_line'] = 1;  
+											if(!empty($instalacion[0]->fecha_instal)){
+												$faseActual['instalacion'] = 2;
+											}
+										}else{
+											$arrayEstado['cert_on_line'] = 0;
+										}
+
+										// fase de control de SVN
+										$controlSvn = $this->controlSvnSeg($idInstalacion);
+
+										if($controlSvn){
+											//$adjuntosCSvn = $this->adjuntoArchivos($id, 8);
+											$arrayEstado['control_svn'] = 1;
+											$faseActual['control_svn'] = 1;
+
+											if(!empty($controlSvn[0]->fecha_subversion)){
+												$faseActual['cert_on_line'] = 2;
+											}
+
+											// fase de aceptacion del cliente
+											$aceptacionCliente = $this->aceptacionCliSeg($controlSvn[0]->id_control_svn);
+
+											if($aceptacionCliente){
+												$arrayEstado['aceptacion_cliente'] = 1;
+												$faseActual['aceptacion_cliente'] = 1;
+
+												if(!empty($aceptacionCliente[0]->fecha_aceptacion)){
+													$faseActual['control_svn'] = 2;
+												}
+
+												if(!empty($aceptacionCliente[0]->id_aceptacion)){
+													$faseActual['aceptacion_cliente'] = 2;
+												}
+
+
+											}else{
+												$arrayEstado['aceptacion_cliente'] = 0;
+											}
+
+										}else{
+											$arrayEstado['control_svn'] = 0;
+										}
+									}else{
+											if($instalacionAsig[0]->accesible == 'Si')
+												$faseActual['instalacion'] = 1;
+											//$arrayEstado['instalacion'] = 0;
+									}
+
+								}else{  // certificacion y prueba
+										if($certificacion[0]->accesible == 'Si')
+											$faseActual['certificacion'] = 1;
+										//$arrayEstado['instalacion_asig'] = 0;
+										$arrayEstado['instalacion'] = 0;
+								}
+
+							}else{
+									if($desarrollo[0]->accesible == 'Si')
+										$faseActual['desarrollo'] = 1;
+
+									$arrayEstado['prueba'] = 0;
+							}
+
+						}else{
+								if($asignacion[0]->accesible == 'Si')
+									$faseActual['asignacion'] = 1;
+
+								$arrayEstado['desarrollo'] = 0;
+						}
+			
+					}else{
+							if($aprobacion->accesible == 'Si')
+								$faseActual['aprobacion'] = 1;
+
+							$arrayEstado['asignacion'] = 0;
+					}
+
+				}else{
+						if($detalle[0]->accesible == 'Si')
+							$faseActual['inicio_req'] = 1;
+
+						$arrayEstado['aprobacion'] = 0;
+						$arrayEstado['inicio_req'] = 0;
+				}
+
+
+				//	$estado = (rechazaso, depurado, aprobado, en curso)
+				$arraycodFase = array(  'id_fase1' => 1, 
+										'id_fase2' => 2,
+										'id_fase3' => 3,
+										'id_fase4' => 4,
+										'id_fase5' => 5,
+										'id_fase6' => 6,
+										'id_fase7' => 7,
+										'id_fase8' => 8,
+										'id_fase9' => 9,
+										'id_fase10' => 10 );
+				
+				$arrayFases = array('inicio_req' => 
+											array('nom_fase' => 'Inicio Requerimiento',
+												  'desc_fase' => 'Inicia Requerimiento', 
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['inicio_req'],
+												  'id_fase' => $arraycodFase['id_fase1'],
+												  'fase_actual' => $faseActual['inicio_req']
+												),
+									'aprobacion' => 
+											array('nom_fase' => 'Fase de Aprobación',
+												  'desc_fase' => 'Aprobación Opr.',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['aprobacion'],
+												  'id_fase' => $arraycodFase['id_fase2'],
+												  'fase_actual' => $faseActual['aprobacion']
+												),
+									'asignacion' => 
+											array('nom_fase' => 'Fase de Asignación',
+												  'desc_fase' => 'Asignación en Des.',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['asignacion'],
+												  'id_fase' => $arraycodFase['id_fase3'],
+												  'fase_actual' => $faseActual['asignacion']
+												),
+									'desarrollo' => 
+											array('nom_fase' => 'Fase de Desarrollo',
+												  'desc_fase' => 'Desarrollo Req',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['desarrollo'],
+												  'id_fase' => $arraycodFase['id_fase4'],
+												  'fase_actual' => $faseActual['desarrollo']
+
+												),
+									'prueba' => 
+											array('nom_fase' => 'Fase de Prueba Opr.',
+												  'desc_fase' => 'Prueba Opr',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['prueba'],
+												  'id_fase' => $arraycodFase['id_fase5'],
+												  'fase_actual' => $faseActual['prueba']
+												),
+									'certificacion' => 
+											array('nom_fase' => 'Fase de Certificación',
+												  'desc_fase' => 'Desarrollo Asignación Instalación.',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['certificacion'],
+												  'id_fase' => $arraycodFase['id_fase6'],
+												  'fase_actual' => $faseActual['prueba']
+												),
+									'instalacion' => 
+											array('nom_fase' => 'Fase de Instalación',
+												  'desc_fase' => 'Instalación por Des.',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['instalacion'],
+												  'id_fase' => $arraycodFase['id_fase7'],
+												  'fase_actual' => $faseActual['instalacion']
+												),
+									'cert_online' => 
+											array('nom_fase' => 'Fase de Certificación Online',
+												  'desc_fase' => 'Certificación Online Opr',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['cert_on_line'],
+												  'id_fase' => $arraycodFase['id_fase8'],
+												  'fase_actual' => $faseActual['cert_on_line']
+												),
+									'control_version' => 
+											array('nom_fase' => 'Fase de Control de Svn',
+												  'desc_fase' => 'Control de Versión Des.',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['control_svn'],
+												  'id_fase' => $arraycodFase['id_fase9'],
+												  'fase_actual' => $faseActual['control_svn']
+												),
+									'aceptacion_cliente' => 
+											array('nom_fase' => 'Fase de Aceptación del Cliente',
+												  'desc_fase' => 'Aceptación cliente.',
+												  'id_requerimiento' => $id,
+												  'estado' => $arrayEstado['aceptacion_cliente'],
+												  'id_fase' => $arraycodFase['id_fase10'],
+												  'fase_actual' => $faseActual['aceptacion_cliente']
+												)
+									);
+
+				foreach($arrayFases as $keyf => $valuef){
+				
+						if($valuef['fase_actual'] == 1){
+							$nombre_fase = $valuef['nom_fase'];
+							$desc_fase = $valuef['desc_fase'];
+							$fase_actual = $valuef['fase_actual'];
+							$estado = "pendiente";
+						}else{
+								if($keyf == 'aceptacion_cliente' ){
+									if($valuef['fase_actual'] == 2){
+										$nombre_fase = $valuef['nom_fase'];
+										$desc_fase = $valuef['desc_fase'];
+										$fase_actual = $valuef['fase_actual'];
+										$estado = "solucion_exitosa";
+									}
+								}
+						}
+				}
+
+				$arrayPendientes = array(  'id_requerimiento' => $id,
+												'idProgramador' => $valuerq->id_programador,
+												'fechaSolicitud' => $valuerq->fecha_solicitud,
+												'desarrollador' => $valuerq->desarro,
+												'operador' => $valuerq->operador,
+												'nombreCliente' => $valuerq->nombre,
+												'nombre_fase' => $nombre_fase,
+												'desc_fase' => $desc_fase,
+												'fase_actual' => $fase_actual,
+												'estado' => $estado
+				  							);
+					array_push($arrayP, $arrayPendientes);
+		}//end foreach	
+
+
+		$objPendietes = $arrayP;
+
+	//	dd($objPendietes);
+		return $objPendietes;	
+	}
+
+	public function listaPendDetalle($fecha_inicio, $fecha_fin){
+
+		$lista = DB::select('SELECT ap.Nro_asignacion, ap.id_requerimiento, ap.id_gestor, ap.id_programador, ap.fecha_asignacion, ap.hora_asignacion, ap.operador, CONCAT(us.name ," ",us.ap_paterno) as desarro, cl.nombre, ap.fecha_solicitud
+			FROM (
+					SELECT ar.Nro_asignacion, ar.id_requerimiento, ar.id_gestor, ar.id_programador, ar.fecha_asignacion, ar.hora_asignacion, CONCAT(u.name, " ", u.ap_paterno) operador,r.id_cliente, r.fecha_solicitud
+					FROM tb_requerimiento r 
+		    		JOIN tb_asignacion_requerimiento ar on r.id_requerimiento=ar.id_requerimiento
+					JOIN users u on r.id_operador=u.id 
+					WHERE r.fecha_solicitud BETWEEN :fecha_inicio and :fecha_fin
+			)ap
+			JOIN users us on ap.id_programador = us.id
+			JOIN tb_cliente cl on ap.id_cliente = cl.id_cliente
+        	ORDER BY ap.id_requerimiento DESC', ['fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin]);
+
+		return $lista;
 	}
 	
 
