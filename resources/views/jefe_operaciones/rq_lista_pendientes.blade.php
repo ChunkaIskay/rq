@@ -75,8 +75,7 @@
                           <td>{{ $value['operador'] }}</td>
                           <td>{{ $value['nombreCliente'] }}</td>
                           <td>{{ $value['estado'] }}</td>
-                          <td class="td-actions text-right">
-                          </td>
+                          
                       </tr> 
                   @endforeach
                   @endif

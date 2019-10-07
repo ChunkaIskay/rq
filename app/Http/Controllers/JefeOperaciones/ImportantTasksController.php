@@ -149,12 +149,10 @@ class ImportantTasksController extends Controller
 
     public function deleteFile(Request $request){
 	
-	
 	  try {
             $adjunto = Adjunto::findOrFail($request['idAdjunto']);
 
 		    $archivo_path = storage_path("app/files/{$adjunto->nombre}");
-
 
 		    if (File::exists($archivo_path)) {
 
@@ -189,7 +187,7 @@ class ImportantTasksController extends Controller
     }																		
 
 
-    function uploadFile(Request $request){
+    public function uploadFile(Request $request){
 
 		if(request()->file('rqdoc')){
 
@@ -554,9 +552,12 @@ class ImportantTasksController extends Controller
 		->get();
 
 		$operador = DB::table('users')
-		->where('tipo', '=' , 'Operador')
-		->select('id','name','ap_paterno','tipo','activo')
-		->get();
+			->join('role_user', 'users.id','=','role_user.user_id')
+			->join('roles', 'role_user.role_id','=','roles.id')
+			->where('roles.id', '=' , '5')
+			->where('users.activo', '=' , 'Si')
+			->select('users.id','users.name','users.ap_paterno','roles.name as tipo','activo')
+			->get();
 
 		return view('jefe_operaciones.rq_reasignar_editar')->with(compact('detalle','fechasOpDe','operador'));
     
@@ -567,11 +568,20 @@ class ImportantTasksController extends Controller
         $requerimiento = Requerimiento::find($id);
         $requerimiento->id_operador = $request->id_ope;
        
-       	$operador = DB::table('users')
+        $operador = DB::table('users')
+		->join('role_user', 'users.id','=','role_user.user_id')
+		->join('roles', 'role_user.role_id','=','roles.id')
+		->where('users.id','=',$request->id_ope)
+		->where('roles.id', '=' , '5')
+		->where('users.activo', '=' , 'Si')
+		->select('users.id','users.name','users.ap_paterno','roles.name as tipo','activo')
+		->get();
+
+       /*	$operador = DB::table('users')
 		->where('tipo', '=' , 'Operador')
 		->where('id','=',$request->id_ope)
 		->select('id','name','ap_paterno','tipo','activo')
-		->get();
+		->get();*/
 
     	$requerimiento->save();  // update 
 

@@ -111,7 +111,7 @@ window.onload = tiempo;
     </ul>
     @endauth
     <!-- End of Sidebar -->
-
+ @auth
     <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
 
@@ -139,6 +139,7 @@ window.onload = tiempo;
           </form>
 
           <!-- Topbar Navbar -->
+         
           <ul class="navbar-nav ml-auto">
 
             <!-- Nav Item - Search Dropdown (Visible Only XS) -->
@@ -359,10 +360,6 @@ window.onload = tiempo;
                     {{ csrf_field() }}
                 </form>
         </div>
-
-
-
-
       </div>
     </div>
   </div>
@@ -378,11 +375,9 @@ window.onload = tiempo;
       <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
       <!-- Custom scripts for all pages-->
       <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
-      <!-- Page level plugins -->
-      <script src="{{ asset('vendor/chart.js/Chart.js') }}"></script>
-      <!-- Page level custom scripts -->
-      <!--<script src="{{ asset('js/demo/chart-area-demo.js') }}"></script>
-      <script src="{{ asset('js/demo/chart-pie-demo.js') }}"></script>-->
+      <script src="{{ asset('vendor/chart/Chart.js') }}"></script>
+
+      
 <!-- Latest compiled and minified JavaScript -->
       <script src="{{ asset('bootstrap/dist/js/bootstrap.min.js') }}"></script>
 
@@ -392,6 +387,7 @@ window.onload = tiempo;
       <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
       <script src="{{ asset('js/dataTableAll.js') }}"></script>
+
 
 <script type="text/javascript">
 
@@ -439,6 +435,18 @@ window.onload = tiempo;
   
  
  </script>
+  @endauth
+  @guest
+  <a class="btn btn-primary" href="{{ route('logout') }}"
+                      onclick="event.preventDefault();
+                               document.getElementById('logout-form').submit();">
+                      Cerrar sesión
+                  </a>
 
+                  <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                      {{ csrf_field() }}
+                  </form>
+
+  @endguest
 </body>
 </html>

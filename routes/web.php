@@ -11,14 +11,30 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/home',  array(	'as' => 'menuRol',	'middleware' => 'auth',	'uses' => 'MenuRolController@index'));
 
+//Route::get('/JefeOperaciones/home', 'HomeController@index')->name('home');
+//Route::get('/JefeOperaciones/rqx','Tasks@index');
+Route::get('JefeSistemas/rq-aprobados', 'JefeSistemas\ImportantTasksController@index')->name('rqAprob');
+Route::get('JefeSistemas/{id}/rq-detalle-aprob', 'JefeSistemas\ImportantTasksController@rqDetalleAprob')->name('detalleAprob');
+Route::post('JefeSistemas/{id}/rq-guardar-aprob','JefeSistemas\ImportantTasksController@rqGuadarAprob')->name('guadarAprobar');
+// dowload
+Route::get('JefeSistemas/{id}/download','JefeSistemas\ImportantTasksController@download')->name('downFileAprob');
+Route::post('JefeSistemas/subir-archivo','JefeSistemas\ImportantTasksController@uploadFile')->name('subirArchivo');
+
+	
+// Jefe de Sistemas
+/*Route::middleware(['auth','JefeSistemas'])->prefix('JefeSistemas')->namespace('JefeSistemas')->group(function () {
+	//home
+	Route::get('/rq-pendientes-aprob', 'TasksController@index')->name('rqPendientesAprob');
+	//lista
+//	Route::get('/rq-pendientes','ImportantTasksController@rqPendientes')->name('rqPendientes');
+	//detalle
+//	Route::get('/{id}/rq-detalle','ImportantTasksController@pendienteDetalle')->name('pendDetalle'); 
+
+});
+*/
 
 
-
-
-	//Route::get('/JefeOperaciones/home', 'HomeController@index')->name('home');
-	//Route::get('/JefeOperaciones/rqx','Tasks@index');
-
-	Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namespace('JefeOperaciones')->group(function () {
+Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namespace('JefeOperaciones')->group(function () {
 	// nota:se saco /JefeOperaciones/ de todas las rutas de products y se agrego el prefix(JefeOperaciones)
 	Route::get('/home', 'ImportantTasksController@index')->name('home');
 	//lista
@@ -99,17 +115,56 @@ Route::get('/home',  array(	'as' => 'menuRol',	'middleware' => 'auth',	'uses' =>
 	//Cliente nuevo
 	Route::get('/nuevo-cliente','SpecialTasksController@nuevoCliente')->name('nuevoCliente');
 	Route::post('/guardar-cliente','SpecialTasksController@guardarCliente')->name('guardarCliente');
+	
 	//CLiente modificar
 	Route::get('/{id}/modificar-cliente','SpecialTasksController@modificarCliente')->name('modificarCliente');
 	Route::post('/{id}/editar-cliente','SpecialTasksController@editarCliente')->name('editarCliente');
+
+	//Operador
+	Route::get('/lista-operador','SpecialTasksController@listaOperadores')->name('listaOperadores');
+	//Operador nuevo
+	Route::get('/nuevo-operador','SpecialTasksController@nuevoOperador')->name('nuevoOperador');
+	Route::post('/guardar-operador','SpecialTasksController@guardarOperador')->name('guardarOperador');
 	
+	//Operador modificar
+	Route::get('/{id}/modificar-operador','SpecialTasksController@modificarOperador')->name('modificarOperador');
+	Route::post('/{id}/editar-operador','SpecialTasksController@editarOperador')->name('editarOperador');
 
+	//Certificaciones lista
+	Route::get('/lista-certificaciones','SpecialTasksController@listaCertificaciones')->name('listaCertificaciones');
+	Route::get('/search-certificaciones','SpecialTasksController@listaCertificaciones')->name('listaCertificaciones');
+	Route::post('/search-certificaciones','SpecialTasksController@searchCertificaciones')->name('searchCert');
 
+	//Certificaciones Online lista
+	Route::get('/lista-cert-online','SpecialTasksController@listaCertificacionesOnline')->name('listaCertOnline');
+	Route::get('/search-cert-online','SpecialTasksController@listaCertificacionesOnline')->name('listaCertOnline');
+	Route::post('/search-cert-online','SpecialTasksController@searchCertificacionesOnline')->name('searchCertOnline');
 
+	// graficos y reportes
+	Route::get('/graficos/reportes','SpecialTasksController@reportes')->name('reportes');
+	Route::get('/graficos/graficos-act-ant','SpecialTasksController@reporteAntAct')->name('reporteAnteriorActual');
 
+	Route::get('/graficos/graficos-any-date','SpecialTasksController@reporteAnyDate')->name('rpAnyDate');
+	Route::get('/graficos/search-graficos','SpecialTasksController@reporteAnyDate')->name('rqSearchGraficos');
+	Route::post('/graficos/search-graficos','SpecialTasksController@searchGraficos')->name('rqSearchGraficos');
+
+	//tiepo fase requerimientos
+	Route::get('/rq-fase-tiempo','SpecialTasksController@rqFaseTiempo')->name('faseTiempo');
+	Route::get('/search-fase-tiempo','SpecialTasksController@rqSearchFaseTiempo')->name('searchFaseTiempo');
+	Route::post('/search-fase-tiempo','SpecialTasksController@rqSearchFaseTiempo')->name('searchFaseTiempo');
 });
 
-	Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
+//logout
+Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
+
+// graficos y reportes
+Route::get('/graficos/reportes','GraficosEstadisticosController@reportes')->name('reportes');
+Route::get('/graficos/graficos-act-ant','GraficosEstadisticosController@reporteAntAct')->name('reporteAnteriorActual');
+
+Route::get('/graficos/graficos-any-date','GraficosEstadisticosController@reporteAnyDate')->name('rpAnyDate');
+Route::get('/graficos/search-graficos','GraficosEstadisticosController@reporteAnyDate')->name('rqSearchGraficos');
+Route::post('/graficos/search-graficos','GraficosEstadisticosController@searchGraficos')->name('rqSearchGraficos');
+
 
 
 //Route::get('/menu', 'MenuRolController@index')->name('menu');

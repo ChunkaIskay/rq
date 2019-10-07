@@ -28,7 +28,7 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
     
-    public function importantTask(){
+    public function importantTask(){ dd("entro 22");
         return $this->hasMany('App\ImportantTask', 'id_requerimiento');
     }
 

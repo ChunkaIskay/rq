@@ -9,6 +9,7 @@ function getMenuRol()
         ->select('role_user.role_id as role_id','role_user.user_id as user_id', 'roles.name as role') 
         ->where( 'role_user.user_id',auth()->user()->id)
         ->first();
+
     if(!empty($role->role)){
         $rol = $role->role;
     }
@@ -27,10 +28,10 @@ function getMenuRol()
                                     ORDER BY menu_role.menu_id, menu.submenu_id 
                                     ASC
                 )rs', ['id' => $role->role_id]);
-  //  $fullName = auth()->user()->name." ".auth()->user()->ap_paterno;
-  //  $cuentaUsuario = auth()->user()->cuenta_usuario;
-//dd($menu);
+    //  $fullName = auth()->user()->name." ".auth()->user()->ap_paterno;
+    //  $cuentaUsuario = auth()->user()->cuenta_usuario;
+    //dd($menu);
 	//return view('home')->with(compact('menu','fullName','cuentaUsuario'));
     return $menu;
         
-    }
+}
