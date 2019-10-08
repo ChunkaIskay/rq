@@ -218,4 +218,34 @@ class ImportantTasksController extends Controller
     	)); 
     	
 	}
+
+
+	public function rqCertificados(){   
+/*
+		SELECT * FROM tb_requerimiento r 
+JOIN tb_asignacion_requerimiento ar on r.id_requerimiento=ar.id_requerimiento 
+JOIN tb_solucion_requerimiento sr on ar.Nro_asignacion=sr.id_asignacion
+JOIN tb_certificacion ON sr.id_solucion=tb_certificacion.id_solucion
+JOIN users ON tb_certificacion.id_operador=users.id
+WHERE tb_certificacion.accesible='Si' 
+ORDER BY tb_certificacion.id_certificacion*/
+
+
+        $listCert = DB::table('tb_requerimiento as r')
+        ->join('tb_asignacion_requerimiento as ar', 'r.id_requerimiento', '=','ar.id_requerimiento')
+        ->join('tb_solucion_requerimiento as sr' ,'ar.Nro_asignacion','=','sr.id_asignacion')
+        ->join('tb_certificacion', 'sr.id_solucion','=','tb_certificacion.id_solucion')
+    	->join( 'users','tb_certificacion.id_operador', '=', 'users.id')
+		->where('tb_certificacion.accesible', '=' , 'Si')
+        
+        ->select('tb_certificacion.id_certificacion','tb_certificacion.id_solucion','tb_certificacion.fecha_certificacion','tb_certificacion.hora_certificacion','tb_certificacion.accesible','r.id_requerimiento','users.name','users.ap_paterno')
+		
+		->orderBy('tb_certificacion.id_certificacion','ASC')
+		->get();
+	  
+		return view('jefe_sistemas.rq_certificados')->with(compact('listCert'));    
+	    
+	}
+
+
 }

@@ -13,9 +13,18 @@ Route::get('/home',  array(	'as' => 'menuRol',	'middleware' => 'auth',	'uses' =>
 
 //Route::get('/JefeOperaciones/home', 'HomeController@index')->name('home');
 //Route::get('/JefeOperaciones/rqx','Tasks@index');
+
+//Asignación a Rq. Rq aprobados.
 Route::get('JefeSistemas/rq-aprobados', 'JefeSistemas\ImportantTasksController@index')->name('rqAprob');
 Route::get('JefeSistemas/{id}/rq-detalle-aprob', 'JefeSistemas\ImportantTasksController@rqDetalleAprob')->name('detalleAprob');
 Route::post('JefeSistemas/{id}/rq-guardar-aprob','JefeSistemas\ImportantTasksController@rqGuadarAprob')->name('guadarAprobar');
+
+// Rq certificados
+Route::get('JefeSistemas/rq-certificados', 'JefeSistemas\ImportantTasksController@rqCertificados')->name('rqCertificados');
+Route::get('JefeSistemas/{id}/rq-detalle-cert', 'JefeSistemas\ImportantTasksController@rqDetalleCert')->name('detalleCert');
+Route::post('JefeSistemas/{id}/rq-guardar-cert','JefeSistemas\ImportantTasksController@rqGuadarCert')->name('guadarCertifidos');
+
+
 // dowload
 Route::get('JefeSistemas/{id}/download','JefeSistemas\ImportantTasksController@download')->name('downFileAprob');
 Route::post('JefeSistemas/subir-archivo','JefeSistemas\ImportantTasksController@uploadFile')->name('subirArchivo');
