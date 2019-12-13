@@ -17,6 +17,7 @@ use File;
 use Illuminate\Support\Collection as Collection;
 
 
+
 class ImportantTasksController extends Controller
 {
  
@@ -376,9 +377,11 @@ class ImportantTasksController extends Controller
 
      public function rqExaminarList(){
 
-   		$rqexaminar = DB::select('SELECT * FROM tb_requerimiento 
+   		$rqexaminar = DB::select('SELECT DISTINCT tb_requerimiento.id_requerimiento, tb_requerimiento.tipo, tb_requerimiento.tipo_tarea, tb_requerimiento.fecha_solicitud, tb_requerimiento.hora_solicitud, tb_requerimiento.prioridad, tb_requerimiento.accesible FROM tb_requerimiento 
    			JOIN tb_cliente ON tb_requerimiento.id_cliente=tb_cliente.id_cliente 
-   			JOIN tb_usuario ON tb_requerimiento.id_operador=tb_usuario.id_usuario');
+   			JOIN users ON tb_requerimiento.id_operador=users.id 
+            ORDER BY tb_requerimiento.id_requerimiento ASC');
+
    		$pagTitulo = "Examinar requerimiento";
    		$pag = "examinar";
 
@@ -590,7 +593,7 @@ class ImportantTasksController extends Controller
     	));
     }
 
-     public function rqPrioridadListado(){
+    public function rqPrioridadListado(){
 
    		$rqexaminar = DB::select('SELECT * FROM tb_requerimiento 
    			JOIN tb_cliente ON tb_requerimiento.id_cliente=tb_cliente.id_cliente 
@@ -659,14 +662,14 @@ class ImportantTasksController extends Controller
 
      public function rqPrioridadActualizar(Request $request, $id){
       //  $this->validate($request, Contract::$rules, Contract::$messages);
-     	
-        $requerimiento = Requerimiento::find($id);
+
+     	$requerimiento = Requerimiento::find($id);
         $requerimiento->prioridad = $request->prioridad;
         $requerimiento->motivo_cambio = $request->desc_obs;
        
     	$requerimiento->save();  // update 
 
-    	return redirect()->route('rqPrioridadListado')->with(array(
+    	return redirect()->route('rqPrioridadList')->with(array(
     		'message' => 'Cambio con exito la prioridad del requerimiento '. $id.'.!!'
     	));
     }
@@ -1404,7 +1407,14 @@ class ImportantTasksController extends Controller
 	}
 
 	public function requerimientosPendientes($listaRq){ 	
+		
+		
 		$arrayP = array();
+		$nombre_fase = '';
+		$desc_fase = '';
+		$fase_actual = '';
+		$estado = '';
+
 		foreach ($listaRq as $key => $valuerq){
 		
 				$id = $valuerq->id_requerimiento;
@@ -1774,14 +1784,6 @@ class ImportantTasksController extends Controller
 		return $lista;
 	}
 	
-
-
-	
-
-
-
-
-
 
 	
 

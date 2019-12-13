@@ -24,11 +24,94 @@ Route::get('JefeSistemas/rq-certificados', 'JefeSistemas\ImportantTasksControlle
 Route::get('JefeSistemas/{id}/rq-detalle-cert', 'JefeSistemas\ImportantTasksController@rqDetalleCert')->name('detalleCert');
 Route::post('JefeSistemas/{id}/rq-guardar-cert','JefeSistemas\ImportantTasksController@rqGuadarCert')->name('guadarCertifidos');
 
+// Fecha de entrega Planifiacda y horas desarrollo
+Route::get('JefeSistemas/entrega-planificada', 'JefeSistemas\ImportantTasksController@entregaPlanificada')->name('entregaPlanificada');
+Route::get('JefeSistemas/search-rq','JefeSistemas\ImportantTasksController@searchlistaRq')->name('searchlistRq');
+Route::post('JefeSistemas/search-rq','JefeSistemas\ImportantTasksController@searchlistaRq')->name('searchlistRq');
+
+Route::get('JefeSistemas/{id}/rq-detalle-entrega','JefeSistemas\ImportantTasksController@detalleEntregaDesarrollo')->name('entregaDesarrollo');
+
+Route::post('JefeSistemas/{id}/rq-guardar-entrega','JefeSistemas\ImportantTasksController@rqGuadarEntrega')->name('guadarEntrega');
+
+
+// Revisión estado requerimiento
+//lista all
+Route::get('JefeSistemas/rq-estado-all','JefeSistemas\ImportantTasksController@rqEstadoAll')->name('estadoAll');
+Route::post('JefeSistemas/rq-estado-all','JefeSistemas\ImportantTasksController@rqEstadoAll')->name('estadoAll');
+//lista  asignados
+Route::get('JefeSistemas/rq-estado-all-asig','JefeSistemas\ImportantTasksController@rqEstadoAsig')->name('estadoAsig');
+Route::post('JefeSistemas/rq-estado-all-asig','JefeSistemas\ImportantTasksController@rqEstadoAsig')->name('estadoAsig');
+//lista desarrollo
+Route::get('JefeSistemas/rq-estado-all-desa','JefeSistemas\ImportantTasksController@rqEstadoDesa')->name('estadoDesa');
+Route::post('JefeSistemas/rq-estado-all-desa','JefeSistemas\ImportantTasksController@rqEstadoDesa')->name('estadoDesa');
+//lista Pruebas
+Route::get('JefeSistemas/rq-estado-all-pruebas','JefeSistemas\ImportantTasksController@rqEstadoPruebas')->name('estadoPruebas');
+Route::post('JefeSistemas/rq-estado-all-pruebas','JefeSistemas\ImportantTasksController@rqEstadoPruebas')->name('estadoPruebas');
+//lista Instalación
+Route::get('JefeSistemas/rq-estado-all-inst','JefeSistemas\ImportantTasksController@rqEstadoInst')->name('estadoInst');
+Route::post('JefeSistemas/rq-estado-all-inst','JefeSistemas\ImportantTasksController@rqEstadoInst')->name('estadoInst');
+//lista certificado
+Route::get('JefeSistemas/rq-estado-all-cert','JefeSistemas\ImportantTasksController@rqEstadoCert')->name('estadoCert');
+Route::post('JefeSistemas/rq-estado-all-cert','JefeSistemas\ImportantTasksController@rqEstadoCert')->name('estadoCert');
+// end estado rq
+
+//lista seguimiento
+Route::get('JefeSistemas/rq-seguimiento','JefeSistemas\ImportantTasksController@rqSeguimiento')->name('seguimiento');
+Route::post('JefeSistemas/rq-seguimiento','JefeSistemas\ImportantTasksController@rqSeguimiento')->name('seguimiento');
+//destalle seguimiento
+Route::get('JefeSistemas/{id}/rq-seguimiento','JefeSistemas\ImportantTasksController@rqSegtoDetalle')->name('seguimientoDetalle');
+
+
+// Cambiar Prioridad a rq 
+//lista 
+Route::get('JefeSistemas/rq-prioridad-listado','JefeSistemas\ImportantTasksController@rqPrioridadListado')->name('rqPrioridadList1');
+//editar
+Route::get('JefeSistemas/{id}/rq-prioridad-editar','JefeSistemas\ImportantTasksController@rqPrioridadEditar')->name('prioridadEditar');
+//actulizar
+Route::post('JefeSistemas/{id}/rq-prioridad-actualizar','JefeSistemas\ImportantTasksController@rqPrioridadActualizar')->name('prioridadEditar');
+
+Route::get('JefeSistemas/{id}/download/','JefeSistemas\ImportantTasksController@download')->name('downloadFile');
+Route::post('JefeSistemas/aprobar-pendiente','JefeSistemas\ImportantTasksController@aprobarRqPen')->name('aprobarPendiente');
+
+//Desarrollador
+Route::get('JefeSistemas/lista-desarrollador','JefeSistemas\ImportantTasksController@listaDesarrolladores')->name('listaDesa');
+//Desarrollador nuevo
+Route::get('JefeSistemas/nuevo-desarrollador','JefeSistemas\ImportantTasksController@nuevoDesarrollador')->name('nuevoDesa');
+Route::post('JefeSistemas/guardar-desarrollador','JefeSistemas\ImportantTasksController@guardarDesarrollador')->name('guardarDesa');
+//Desarrollador modificar
+Route::get('JefeSistemas/{id}/modificar-desarrollador','JefeSistemas\ImportantTasksController@modificarDesarrollador')->name('modificarDesarrollador');
+Route::post('JefeSistemas/{id}/editar-desarrollador','JefeSistemas\ImportantTasksController@editarDesarrollador')->name('editarDesarrollador');
+
+
+//Asignación de Rq. a instlar
+Route::get('JefeSistemas/rq-asignar-instalar', 'JefeSistemas\ImportantTasksController@listarAsigInstalar')->name('rqListarAsigInst');
+Route::post('JefeSistemas/search-asignar-instalar','JefeSistemas\ImportantTasksController@searchAsigInstalar')->name('searchAsignarInstalar');
+
+Route::get('JefeSistemas/{id}/rq-detalle-asig-inst', 'JefeSistemas\ImportantTasksController@rqDetalleAsigInstalar')->name('detalleAsigInst');
+
+Route::post('JefeSistemas/{id}/rq-guardar-instalar','JefeSistemas\ImportantTasksController@rqGuadarInstalar')->name('guadarInstalar');
+
+//Asignación de Rq. a SOLUCIONAR.
+Route::get('JefeSistemas/rq-asignar-solucionar', 'JefeSistemas\ImportantTasksController@listarAsigSolucionar')->name('rqListarAsigSolu');
+Route::post('JefeSistemas/search-asignar-solucionar','JefeSistemas\ImportantTasksController@searchAsigSolucionar')->name('searchAsignarSolucionar');
+
+Route::get('JefeSistemas/{id}/rq-detalle-asig-solu', 'JefeSistemas\ImportantTasksController@rqDetalleAsigSolucionar')->name('detalleAsigSolu');
+
+Route::post('JefeSistemas/{id}/rq-guardar-solu','JefeSistemas\ImportantTasksController@rqGuadarSolucionar')->name('guadarSolucionar');
+
+// graficos y reportes
+Route::get('JefeSistemas/graficos/reportes','GraficosEstadisticosController@reportes')->name('reportes');
+Route::get('JefeSistemas/graficos/graficos-act-ant','GraficosEstadisticosController@reporteAntAct')->name('reporteAnteriorActual');
+
+Route::get('JefeSistemas/graficos/graficos-any-date','GraficosEstadisticosController@reporteAnyDate')->name('rpAnyDate');
+
+//Route::get('JefeefeSistemas/{id}/rq-detalle-cert', 'JefeSistemas\ImportantTasksController@rqDetalleCert')->name('detalleCert');
+//Route::post('JefeSistemas/{id}/rq-guardar-cert','JefeSistemas\ImportantTasksController@rqGuadarCert')->name('guadarCertifidos');
+
 
 // dowload
 Route::get('JefeSistemas/{id}/download','JefeSistemas\ImportantTasksController@download')->name('downFileAprob');
 Route::post('JefeSistemas/subir-archivo','JefeSistemas\ImportantTasksController@uploadFile')->name('subirArchivo');
-
 	
 // Jefe de Sistemas
 /*Route::middleware(['auth','JefeSistemas'])->prefix('JefeSistemas')->namespace('JefeSistemas')->group(function () {
@@ -41,6 +124,43 @@ Route::post('JefeSistemas/subir-archivo','JefeSistemas\ImportantTasksController@
 
 });
 */
+
+/******** ROL OPERADOR ********/
+//lista seguimiento
+Route::get('Operador/rq-seguimiento','Operador\ImportantTasksController@rqSeguimiento')->name('seguimiento');
+
+Route::post('Operador/rq-seguimiento','Operador\ImportantTasksController@rqSeguimiento')->name('seguimiento');
+//destalle seguimiento
+Route::get('Operador/{id}/rq-seguimiento','Operador\ImportantTasksController@rqSegtoDetalle')->name('seguimientoDetalle');
+
+
+// Lista de depurar req
+Route::get('Operador/rq-depurar','Operador\ImportantTasksController@rqDepurarReq')->name('rqDepurarRequeriemto'); 
+
+Route::post('Operador/rq-depurar','Operador\ImportantTasksController@rqDepurarReq')->name('rqDepurarRequeriemto');
+
+//detalle depurar
+Route::get('Operador/{id}/rq-depurar-detalle','Operador\ImportantTasksController@rqDepurarDetalle')->name('depuradorDetalle');
+
+Route::post('Operador/{id}/rq-depurar-guardar','Operador\ImportantTasksController@rqGuardarDepurar')->name('guardarDepurar');
+
+//listado de rq pendientes
+
+Route::get('Operador/rq-pendientes','Operador\ImportantTasksController@rqListaPendientes')->name('rqPendintes');
+Route::post('Operador/rq-pendientes','Operador\ImportantTasksController@searchReqPendientes')->name('searchPendientes');
+
+// Requerimientos
+
+//lista
+Route::get('Operador/rq-listado','Operador\ImportantTasksController@rqExaminarList')->name('rqList');
+//detalle
+Route::get('Operador/{id}/req-detalle', 'Operador\ImportantTasksController@rqExaminarDetalle')->name('reqDetalle');	
+//editar
+Route::get('Operador/{id}/rq-modificar','Operador\ImportantTasksController@rqEditar')->name('requerimientoEdit');
+//actulizar
+Route::post('Operador/{id}/rq-actualizar','Operador\ImportantTasksController@rqActualizar')->name('requermientoActualizar');
+
+
 
 
 Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namespace('JefeOperaciones')->group(function () {
@@ -104,7 +224,6 @@ Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namesp
 	//lista certificado
 	Route::get('/rq-estado-all-cert','ImportantTasksController@rqEstadoCert')->name('estadoCert');
 	Route::post('/rq-estado-all-cert','ImportantTasksController@rqEstadoCert')->name('estadoCert');
-
 	//lista seguimiento
 	Route::get('/rq-seguimiento','ImportantTasksController@rqSeguimiento')->name('seguimiento');
 	Route::post('/rq-seguimiento','ImportantTasksController@rqSeguimiento')->name('seguimiento');
@@ -150,12 +269,14 @@ Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namesp
 	Route::post('/search-cert-online','SpecialTasksController@searchCertificacionesOnline')->name('searchCertOnline');
 
 	// graficos y reportes
+	
 	Route::get('/graficos/reportes','SpecialTasksController@reportes')->name('reportes');
 	Route::get('/graficos/graficos-act-ant','SpecialTasksController@reporteAntAct')->name('reporteAnteriorActual');
 
 	Route::get('/graficos/graficos-any-date','SpecialTasksController@reporteAnyDate')->name('rpAnyDate');
+	/*
 	Route::get('/graficos/search-graficos','SpecialTasksController@reporteAnyDate')->name('rqSearchGraficos');
-	Route::post('/graficos/search-graficos','SpecialTasksController@searchGraficos')->name('rqSearchGraficos');
+	Route::post('/graficos/search-graficos','SpecialTasksController@searchGraficos')->name('rqSearchGraficos');*/
 
 	//tiepo fase requerimientos
 	Route::get('/rq-fase-tiempo','SpecialTasksController@rqFaseTiempo')->name('faseTiempo');
@@ -167,10 +288,13 @@ Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namesp
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
 
 // graficos y reportes
+/*
 Route::get('/graficos/reportes','GraficosEstadisticosController@reportes')->name('reportes');
 Route::get('/graficos/graficos-act-ant','GraficosEstadisticosController@reporteAntAct')->name('reporteAnteriorActual');
 
-Route::get('/graficos/graficos-any-date','GraficosEstadisticosController@reporteAnyDate')->name('rpAnyDate');
+Route::get('/graficos/graficos-any-date','GraficosEstadisticosController@reporteAnyDate')->name('rpAnyDate');*/
+
+
 Route::get('/graficos/search-graficos','GraficosEstadisticosController@reporteAnyDate')->name('rqSearchGraficos');
 Route::post('/graficos/search-graficos','GraficosEstadisticosController@searchGraficos')->name('rqSearchGraficos');
 

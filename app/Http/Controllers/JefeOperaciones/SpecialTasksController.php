@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use App\Cliente;
 use App\Operador;
+use Illuminate\Support\Facades\Auth;
 
 
 class SpecialTasksController extends Controller
@@ -124,6 +125,9 @@ class SpecialTasksController extends Controller
 		$this->validate($request, Operador::$rules, Operador::$messages);
 
 		$operador = new Operador();
+		$role_user = new RoleUser();
+		$id_user = Auth::user();
+		
 
 		$operador->name = $request->input('nombre_ope');
 		$operador->ap_paterno = $request->input('paterno');
@@ -135,12 +139,17 @@ class SpecialTasksController extends Controller
 		$operador->tipo = 'Operador';
 		$operador->password = '$2y$10$3uvtSUS.QUrm0m4Kuqk5TODrd06Kd9nWf2fuGT1od9UNYy7F7eMT2';
 		$operador->id_region = $request->departamento;
-		
+
 		if (!$operador->save()){ 
 			return redirect()->route('listaOperadores')->with(array(
 				'error' => 'Error: Al guardar el nuevo Operador!. Por favor intente nuevamente.'));
 				
 		}else{ 
+
+			    $role_user->role_id = 5; // 5 id del rol operaddor 
+				$role_user->user_id = $operador->id; 
+				$role_user->save();
+
 			return redirect()->route('listaOperadores')->with(array(
 				'message' => 'El nuevo Operador se guardo correctamente.'));
 		}

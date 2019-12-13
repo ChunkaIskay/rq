@@ -7,13 +7,13 @@
                 <div class="alert alert-success">
                     {{ session('message') }}
                 </div>
-            @endif  
+          @endif  
 
           @if(session('error'))
                 <div class="alert alert-danger">
                     {{ session('error') }}
                 </div>
-            @endif
+          @endif
           <!-- Page Heading -->
           <h1 class="h3 mb-2 text-gray-800">Lista de nuevos Requerimientos certificados.</h1>
           <p class="mb-4">Lista de requerimientos certificados. </p>
@@ -27,7 +27,6 @@
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-bordered"  class="display" id="dataTable" width="100%" cellspacing="0">
-
                 <thead>
                     <tr>
                         <th class="text-left">Id Certificación</th>
@@ -56,17 +55,15 @@
                     </tr>
                 @endforeach
                 </tbody>
-            </table>
-               
-
+                </table>
               </div>
             </div>
 
-              <div class="row">
-                  <div class="col-md-4"></div>
-                  <div class="col-md-4 text-left"></div>
-                  <div class="col-md-3"></div>
-                </div>  
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4 text-left"></div>
+                <div class="col-md-3"></div>
+            </div>  
           </div>
  
 @endsection

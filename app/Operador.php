@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Operador extends Model
 {
     protected $table = 'users';
-	protected $primaryKey = 'id';
-	public $timestamps = false;	
+  	protected $primaryKey = 'id';
+  	public $timestamps = false;	
 
 
 	public static $messages =[
@@ -30,7 +30,4 @@ class Operador extends Model
            // 'cargo' => 'required|between:3,45'
 
     ];
-
-
-
 }

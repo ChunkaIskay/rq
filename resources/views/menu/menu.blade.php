@@ -12,7 +12,7 @@
           
           <div id="collapsePages_{{ $key }}" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Tareas del {{ $menulist->rol_name }}</h6>
+            <h6 class="collapse-header">Tareas {{ $menulist->rol_name }}</h6>
               @foreach(getMenuRol() as $key1 => $menulist1)
                  @if( $menulist->menu_id == $menulist1->submenu_id &&  $menulist1->level == 1 )
                         <a class="collapse-item" href="{{ url($menulist1->desc_short.'/'.$menulist1->url) }}">{{ $menulist1->name }}</a>  

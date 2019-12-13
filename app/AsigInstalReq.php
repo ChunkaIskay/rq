@@ -4,10 +4,10 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AsignacionReq extends Model
+class AsigInstalReq extends Model
 {
-    protected $table = 'tb_asignacion_requerimiento';
-	protected $primaryKey = 'Nro_asignacion';
+    protected $table = 'tb_asignacion_instal_req';
+	protected $primaryKey = 'id_asig_instal';
 	public $timestamps = false;
 
 	public static $messages =[
@@ -23,13 +23,7 @@ class AsignacionReq extends Model
             'desarrollador.min' => 'Seleccione un desarrollador por favor.',
             'desarrollador.max' => 'Seleccione un desarrollador por favor.',
 
-            'fch_planif.required' => 'Ingrese el campo Año Desde por favor.',
-
-			't_des.required' => 'Ingrese las horas de desarrollo.',
-            't_des.numeric' => 'INgrese datos numericos por favor.',
-            't_des.between' => 'Ingrese las horas de desarrollo.',
-            't_des.min' => 'Las horas tienen que ser mayor a cero.',
-            't_des.max' => 'Ingrese las horas de desarrollo.',
+      
 
     ];
 
@@ -37,9 +31,7 @@ class AsignacionReq extends Model
 	
     	    'gestor' => 'required|numeric|min:1|max:1000',
     	    'desarrollador' => 'required|numeric|min:1|max:1000',
-            'fch_planif' => 'required|min:8',
-            't_des' => 'required|numeric|min:1|max:1440',
+      
     ];
 
-	
 }
