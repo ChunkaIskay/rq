@@ -65,7 +65,7 @@ es: "Elegir"
       <h6 class="m-0 font-weight-bold text-primary">Datos del Requerimiento</h6>
     </div>
     <div class="card-body">
-      <form  class="md-form" id="logout-form2" action="{{ url('/JefeOperaciones/'.$detalle[0]->id_requerimiento .'/rq-actualizar') }}" method="post" enctype="multipart/form-data">
+      <form  class="md-form" id="logout-form2" action="{{ url('/Operador/'.$detalle[0]->id_requerimiento .'/rq-actualizar') }}" method="post" enctype="multipart/form-data">
          {{ csrf_field() }}
           <div class="row">
                 <div class="col-lg-3">  
@@ -184,7 +184,7 @@ es: "Elegir"
                 </div>
           </div>
           <br>
-          @include('jefe_operaciones.listado_adjunto')
+          @include('operador.listado_adjunto')
           <br>
           <div class="row">
             <div class="col-lg-6 text-right">  
@@ -198,7 +198,7 @@ es: "Elegir"
             </div>
             <div class="col-lg-6"> 
                <div class="my-2"></div>
-               <a class="btn btn-primary" href="{{ route('examinarList') }}">
+               <a class="btn btn-primary" href="{{ route('rqList') }}">
                 <span class="icon text-white-50">
                   <i class="fas fa-exclamation-triangle"></i>
                 </span>
@@ -297,11 +297,6 @@ es: "Elegir"
       </div>
     </div>
   </div>
-
-<script type="text/javascript">
-
- 
-</script>
 
 
 @endsection

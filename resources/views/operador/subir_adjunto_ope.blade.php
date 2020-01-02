@@ -1,21 +1,22 @@
- <div class="card shadow mb-4">
+<div class="card shadow mb-4">
               <!-- Card Header - Accordion -->
     <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-      <h6 class="m-0 font-weight-bold text-primary">Descargas</h6>
+      <h6 class="m-0 font-weight-bold text-primary">Subir archivos</h6>
     </a> 
     <!-- Card Content - Collapse -->
     <!--<div class="collapse show" id="collapseCardExample">-->
     
-    <div class="collapse" id="collapseCardExample">
+    <div class="collapse show" id="collapseCardExample">
       <div class="card-body">
        <div class="list-group">
-          <form  class="md-form" action="{{ url('/JefeSistemas/subir-archivo') }}" method="post" enctype="multipart/form-data">
+          <form  class="md-form" action="{{ url('/Operador/subir-archivo') }}" method="post" enctype="multipart/form-data">
             {{ csrf_field() }}
-            <div class="row" style="margin-left: 10px; margin-right: 10px;">      <!--<div class="col-lg-1 text-left"> 
+            <div class="row" style="margin-left: 10px; margin-right: 10px;">      
+                <!--<div class="col-lg-1 text-left"> 
                       <a href="#" type="submit" class="btn btn-success btn-circle btn-sm">
                           <i class="fas fa-upload"></i></a>
                 </div>-->
-                <input type="hidden" name="idrq" value="{{ $detalle[0]->id_requerimiento }}">
+                <input type="hidden" name="idrq" value="{{ $idReqUltimo }}">
                  @if(empty($adjuntos[0]->id_etapa))
                 <input type="hidden" name="etapa" value="1">
                  @else
@@ -33,8 +34,8 @@
           <br>  
           @foreach($adjuntos as $key => $value) 
            <div class="row">
-              <div class="col-lg-11 text-left"> 
-                <a href="{{ route('downFileAprob', $value->id_adjunto) }}"  class="list-group-item list-group-item-info">{{ $value->nombre }}
+              <div class="col-lg-11 text-left">  
+                <a href="{{ route('downloadFile', $value->id_adjunto) }}"  class="list-group-item list-group-item-info">{{ $value->nombre }}
                 </a>
                 <br>
               </div>

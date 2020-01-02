@@ -190,12 +190,14 @@ class ImportantTasksController extends Controller
 
     public function uploadFile(Request $request){
 
+    	date_default_timezone_set('America/La_Paz');
+		
 		if(request()->file('rqdoc')){
 
-        	$adjuntos = Adjunto::all();
-        	$ulitmoAdjunto =  $adjuntos->last()->id_adjunto + 1;
+			$last = DB::table('tb_adjuntos')->orderBy('id_adjunto','DESC')->first();
+ 			$ulitmoAdjunto = $last->id_adjunto + 1;
 
-			$file = request()->file('rqdoc');
+        	$file = request()->file('rqdoc');
 			$nombreArchivo = $request->idrq.'_'.$request->etapa.'_'.$ulitmoAdjunto.'-'.$file->getClientOriginalName();
 
 	        $subirArchivo = $request->rqdoc->storeAs('files', $nombreArchivo);

@@ -149,6 +149,7 @@ Route::post('Operador/{id}/rq-depurar-guardar','Operador\ImportantTasksControlle
 Route::get('Operador/rq-pendientes','Operador\ImportantTasksController@rqListaPendientes')->name('rqPendintes');
 Route::post('Operador/rq-pendientes','Operador\ImportantTasksController@searchReqPendientes')->name('searchPendientes');
 
+
 // Requerimientos
 
 //lista
@@ -159,7 +160,32 @@ Route::get('Operador/{id}/req-detalle', 'Operador\ImportantTasksController@rqExa
 Route::get('Operador/{id}/rq-modificar','Operador\ImportantTasksController@rqEditar')->name('requerimientoEdit');
 //actulizar
 Route::post('Operador/{id}/rq-actualizar','Operador\ImportantTasksController@rqActualizar')->name('requermientoActualizar');
+//Requerimiento nuevo
+Route::get('Operador/nuevo-requerimiento','Operador\ImportantTasksController@nuevoRequerimiento')->name('nuevoReq');
+Route::post('Operador/guardar-req','Operador\ImportantTasksController@guardarRequerimiento')->name('guardarReq');
 
+// subir archivo
+Route::post('Operador/subir-archivo','Operador\ImportantTasksController@uploadFile')->name('subirArchivo');
+	Route::post('Operador/delete-file','Operador\ImportantTasksController@deleteFile')->name('deleteFileOpe');
+
+/*************** Verificador **************/
+
+// Lista de depurar req
+Route::get('Verificador/rq-depurar','Verificador\ImportantTasksController@rqDepurarReq')->name('rqDepurarReqVeri');
+
+Route::post('Verificador/rq-depurar','Verificador\ImportantTasksController@rqDepurarReq')->name('rqDepurarReqVeri');
+
+//detalle depurar
+Route::get('Verificador/{id}/rq-depurar-detalle','Verificador\ImportantTasksController@rqDepurarDetalle')->name('depuradorDetalleVeri');
+
+Route::post('Verificador/{id}/rq-depurar-guardar','Verificador\ImportantTasksController@rqGuardarDepurar')->name('guardarDepurar');
+
+//lista seguimiento
+Route::get('Verificador/rq-seguimiento','Verificador\ImportantTasksController@rqSeguimiento')->name('seguimientoVeri');
+
+Route::post('Verificador/rq-seguimiento','Verificador\ImportantTasksController@rqSeguimiento')->name('seguimientoVeri');
+//destalle seguimiento
+Route::get('Verificador/{id}/rq-seguimiento','Verificador\ImportantTasksController@rqSegtoDetalle')->name('seguimientoDetalleVeri');
 
 
 

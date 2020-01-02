@@ -9,7 +9,7 @@
               <div class="collapse" id="adjunto1">
                 <div class="card-body">
                  <div class="list-group">
-                    <form  class="md-form" action="{{ url('/JefeOperaciones/subir-archivo') }}" method="post" enctype="multipart/form-data">
+                    <form  class="md-form" action="{{ url('/JefeSistemas/subir-archivo') }}" method="post" enctype="multipart/form-data">
                       {{ csrf_field() }}
                       <div class="row" style="margin-left: 10px; margin-right: 10px;">      <!--<div class="col-lg-1 text-left"> 
                                 <a href="#" type="submit" class="btn btn-success btn-circle btn-sm">

@@ -132,7 +132,6 @@ es: "Elegir"
                                   <option value="{{ $depa->id_region }}" @if( $depa->id_region == old('departamento', '')) selected @endif >{{ $depa->nombre }}</option>
                           @endforeach             
                       </select>
-                      
                   </div>
             </div><br>
             <div class="row">

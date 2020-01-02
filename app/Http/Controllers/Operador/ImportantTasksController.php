@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 use App\Requerimiento;
+use App\Rquerimiento;
 use App\Adjunto;
 use App\Operador;
 use App\AprobacionRq;
@@ -21,6 +22,7 @@ use App\AsigInstalReq;
 use App\SolucionRq;
 use App\Instalacion;
 use App\CertOnLine;
+use App\FechaReq;
 
 use File;
 
@@ -105,12 +107,14 @@ class ImportantTasksController extends Controller
 
     public function uploadFile(Request $request){
     	
+    	date_default_timezone_set('America/La_Paz');
+
 		if(request()->file('rqdoc')){
 
-        	$adjuntos = Adjunto::all();
-        	$ulitmoAdjunto =  $adjuntos->last()->id_adjunto + 1;
+			$last = DB::table('tb_adjuntos')->orderBy('id_adjunto','DESC')->first();
+ 			$ulitmoAdjunto = $last->id_adjunto + 1;
 
-			$file = request()->file('rqdoc');
+        	$file = request()->file('rqdoc');
 			$nombreArchivo = $request->idrq.'_'.$request->etapa.'_'.$ulitmoAdjunto.'-'.$file->getClientOriginalName();
 
 	        $subirArchivo = $request->rqdoc->storeAs('files', $nombreArchivo);
@@ -1044,7 +1048,7 @@ class ImportantTasksController extends Controller
 	}
 
 	public function rqGuardarDepurar(Request $request,$id){
-	   
+	   		
 			date_default_timezone_set('America/La_Paz');
 
 		    $this->validate($request, DepurarReq::$rules, DepurarReq::$messages);
@@ -1062,37 +1066,62 @@ class ImportantTasksController extends Controller
 			{
 
 				$rqUpdate = Requerimiento::find($request->input('idr'));
-				$rqUpdate->accesible = 'Rm';
-				$rqUpdate->obs = $request->detalle_depurar;
-				$rqUpdate->save();
 
+				if($rqUpdate){
+					$rqUpdate->accesible = 'Rm';
+					$rqUpdate->obs = $request->detalle_depurar;
+					$rqUpdate->save();	
+				}
+				
 				$aproUpdate = AprobacionRq::find($request->input('idr'));
-				$aproUpdate->accesible = 'Rm';
-				$aproUpdate->save();
+				
+				if($aproUpdate){
+					$aproUpdate->accesible = 'Rm';
+					$aproUpdate->save();	
+				}
 
 				$asigUpdate = AsignacionReq::find($request->input('idr'));
-				$asigUpdate->accesible = 'Rm';
-				$asigUpdate->save();
+				
+				if($asigUpdate){
+					$asigUpdate->accesible = 'Rm';
+					$asigUpdate->save();	
+				}
+				
 
 				$soluUpdate = SolucionRq::find($request->input('idr'));
-				$soluUpdate->accesible = 'Rm';
-				$soluUpdate->save();		
-
+				
+				if($soluUpdate){
+					$soluUpdate->accesible = 'Rm';
+					$soluUpdate->save();
+				}
+						
 				$certUpdate = CertificacionRq::find($request->input('idr'));
-				$certUpdate->accesible = 'Rm';
-				$certUpdate->save();
+				
+				if($certUpdate){
+					$certUpdate->accesible = 'Rm';
+					$certUpdate->save();
+				}
 
-				$asigUpdate = AsigInstalReq::find($request->input('idr'));
-				$asigUpdate->accesible = 'Rm';
-				$asigUpdate->save();
+				$asigInsUpdate = AsigInstalReq::find($request->input('idr'));
+				
+				if($asigInsUpdate){
+					$asigInsUpdate->accesible = 'Rm';
+					$asigInsUpdate->save();	
+				}
 				
 				$instUpdate = Instalacion::find($request->input('idr'));
-				$instUpdate->accesible = 'Rm';
-				$instUpdate->save();
-								
+
+				if($instUpdate){
+					$instUpdate->accesible = 'Rm';
+					$instUpdate->save();	
+				}
+				
 				$certOnUpdate = CertOnLine::find($request->input('idr'));
-				$certOnUpdate->accesible = 'Rm';
-				$certOnUpdate->save();
+				
+				if($certOnUpdate){
+					$certOnUpdate->accesible = 'Rm';
+					$certOnUpdate->save();	
+				}
 
 			}else{
         	
@@ -1615,7 +1644,6 @@ class ImportantTasksController extends Controller
 		->where('id_requerimiento', '=' , $id)
 		->select('fecha_plan_op', 'fecha_plan_de')
 		->get();
-		//dd($fechasOpDe);
 
 		$arrayPrioridad = array(
 								'0.Critico' => 'Critico', 
@@ -1633,20 +1661,18 @@ class ImportantTasksController extends Controller
 								'3.Media' => 'Media', 
 								'3.Medio' => 'Medio', 
 					);
-		//dd($arrayPrioridad);
+
 		$adjuntos = DB::table('tb_adjuntos')
 		->where('id_requerimiento', '=' , $id)
-		->where('id_etapa', '=' , '1')
 		->select('id_adjunto', 'id_requerimiento', 
 				 'id_etapa', 'nombre', 
 				 'fecha', 'hora')
 		->get();
-		//dd($fechasOpDe);	
-
+	
 		//agregar nick del mètodo para subir y borrar archivos
 		$nombreFuncion = 'pendDetalle';
 
-		return view('operador.rq_editar')->with(compact('detalle','fechasOpDe','arrayPrioridad','adjuntos'));
+		return view('operador.rq_editar')->with(compact('nombreFuncion','detalle','fechasOpDe','arrayPrioridad','adjuntos'));
     }
 
 	public function rqActualizar(Request $request, $id){
@@ -1659,10 +1685,166 @@ class ImportantTasksController extends Controller
 
     	$requerimiento->save();  // update 
 
-    	return redirect()->route('examinarList')->with(array(
+    	return redirect()->route('rqList')->with(array(
     		'message' => 'El requerimiento se modifico exitosamente.!!'
     	));
     }
+
+    public function nuevoRequerimiento(){
+
+    	date_default_timezone_set('America/La_Paz');
+	    
+	//    $this->validate($request, AsigInstalReq::$rules, AsigInstalReq::$messages);
+		
+	    $last = DB::table('tb_requerimiento')->orderBy('id_requerimiento','DESC')->first();
+ 		$idReqUltimo = $last->id_requerimiento + 1; 
+
+		$fecha = date('Y-m-d');
+		$hora = date('H:i:s');
+
+		$listaClientes = DB::table('tb_cliente')
+		->select('id_cliente', 'nombre', 'activo')
+		->orderBy('nombre', 'ASC')
+		->get();
+
+		$arrayPrioridad = array(
+						'0.Critico' => 'Critico', 
+						'1.Muy Urgente' => 'Muy Urgente', 
+						'2.Urgente' => 'Urgente', 
+						'3.Cronograma' => 'Cronograma', 
+						'3.Media' => 'Media', 
+						'3.Medio' => 'Medio', 
+						'3.Urgente' => 'Urgente', 
+						'4.Baja' => 'Baja',
+						'4.Bajo' => 'Bajo', 
+						'8.Suspendido'=> 'Suspendido',
+						'2.Urgente' => 'Urgente', 
+						'3.Cronograma' => 'Cronograma', 
+						'3.Media' => 'Media', 
+						'3.Medio' => 'Medio', 
+		);
+
+		$arrayTipo = array(
+						'Evolutivo' => 'Evolutivo', 
+						'Correctivo' => 'Correctivo', 
+						'Gestion' => 'Gestión'
+		 );
+
+		$arrayTipoTarea = array(
+						'mantenimiento' => 'mantenimiento', 
+						'Creacion_de_aplicacion' => 'Creacion de aplicacion' 
+						
+		 );
+/*
+		$fechasOpDe = DB::table('tb_req_fecha')
+		->where('id_requerimiento', '=' , $id)
+		->select('fecha_plan_op', 'fecha_plan_de')
+		->get();*/
+
+		$adjuntos = DB::table('tb_adjuntos')
+			->where('id_requerimiento', '=' , $idReqUltimo)
+			->where('id_etapa', '=' , '1')
+			->select('id_adjunto', 'id_requerimiento', 
+					 'id_etapa', 'nombre', 
+					 'fecha', 'hora')
+			->get();
+
+		$operador = DB::table('users')
+			->join('role_user', 'users.id','=','role_user.user_id')
+			->join('roles', 'role_user.role_id','=','roles.id')
+			->where('roles.id', '=' , '5')
+			->where('users.activo', '=' , 'Si')
+			->select('users.id','users.name','users.ap_paterno','roles.name as tipo','activo')
+			->get();
+
+		$nombreFuncion = 'nuevoReq';
+
+		return view('operador.rq_nuevo')->with(compact('operador','listaClientes','arrayPrioridad','arrayTipo','arrayTipoTarea','operador','fecha','hora','idReqUltimo','adjuntos','nombreFuncion'));
+
+
+    }
+ 
+    public function guardarRequerimiento(Request $request){
+
+		date_default_timezone_set('America/La_Paz');
+		$this->validate($request, Rquerimiento::$rules, Rquerimiento::$messages);
+		$req = new Rquerimiento();
+		//$desarrollador = new Operador();
+		//$role_user = new RoleUser();
+		//$id_user = Auth::user();
+		$req->id_requerimiento = $request->input('id_req');
+		$req->tipo = $request->input('tipo');
+		$req->tipo_tarea = $request->input('tipotarea');
+		$req->fecha_solicitud = $request->input('fecha_soli');
+		$req->hora_solicitud = $request->input('hora_soli');
+		$req->id_cliente = $request->cliente;
+		$req->id_operador = $request->operadorr;
+		$req->prioridad = $request->prioridad;
+		$req->resultado = $request->resul_dese;
+		$req->descripcion = $request->desc;
+		$req->accesible = 'Si';
+		
+		if (!$req->save()){ 
+
+			return redirect()->route('nuevoRequerimiento')->with(array(
+				'error' => 'Error: Al guardar el nuevo requerimento!. Por favor intente nuevamente.'));
+		}else{
+				$rqFecha = new FechaReq();
+
+				$rqFecha->id_requerimiento = $request->input('id_req');
+				$rqFecha->fecha_plan_op = $request->fechalim;
+				$rqFecha->fecha_plan_de = $request->fechalim;
+
+				$rqFecha->save();
+						 	
+			 	return redirect()->route('rqList')->with(array(
+				'message' => 'El nuevo Requerimiento se guardo correctamente.'));
+		}
+
+		return view('jefe_sistemas.lista_desarrollador')->with(compact('listaDesa'));
+
+    }
+
+    public function deleteFile(Request $request){
+	   
+	  try {
+         
+            $adjunto = Adjunto::findOrFail($request['idAdjunto']);
+ 			
+		    $archivo_path = storage_path("app/files/{$adjunto->nombre}");
+
+		    if (File::exists($archivo_path)) {
+
+		       	$dfile = File::delete($archivo_path);
+
+				if($dfile){
+
+					if (!$adjunto->delete()){
+						return redirect()->route($request['nombreFuncion'], $request['id'])->with(array(
+						'error' => 'Error: no se pudo eliminar el archivo completamente!. Por favor comuniquese con administrador.'));
+					}else{
+
+						return redirect()->route($request['nombreFuncion'], $request['id'])->with(array(
+						'message' => 'El archivo se elimino con exito!.'));
+					}
+
+				}else{
+					return redirect()->route($request['nombreFuncion'], $request['id'])->with(array(
+						'error' => 'Error: no se pudo eliminar el archivo!. Por favor intente nuevamente.'));
+				}
+		        unlink($archivo_path);
+			}else{
+
+				return redirect()->route($request['nombreFuncion'], $request['id'])->with(array(
+						'error' => 'Error: No existe el archivo. Por favor comuniquese con el administrador'));
+			}
+		    
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            abort(404);
+        }
+
+    }
+
 
 
 }

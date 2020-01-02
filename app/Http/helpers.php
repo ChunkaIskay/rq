@@ -31,8 +31,8 @@ function getMenuRol()
                 )rs', ['id' => $role->role_id]);
     //  $fullName = auth()->user()->name." ".auth()->user()->ap_paterno;
     //  $cuentaUsuario = auth()->user()->cuenta_usuario;
-   // dd($menu);
-	//return view('home')->with(compact('menu','fullName','cuentaUsuario'));
+    //  dd($menu);
+	//  return view('home')->with(compact('menu','fullName','cuentaUsuario'));
     return $menu;
         
 }

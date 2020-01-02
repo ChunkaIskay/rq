@@ -30,17 +30,21 @@
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-bordered"  class="display" id="dataTable" width="100%" cellspacing="0">
-
                 <thead>
-                    <tr>
-                        <th class="text-center">Id Requerimiento</th>
-                        <th class="text-left">Tipo</th>
-                        <th class="text-left">Fecha Solicitud</th>
-                        <th class="text-left">Hora Solicitud</th>
-                        <th class="text-left">Prioridad</th>
-                        <th class="text-left">Accesible</th>
-                        <th class="text-left">Acciones</th>
-                    </tr>
+                  <tr>
+                    <td colspan="9">Nuevo requerimiento &nbsp;&nbsp;&nbsp;<a href="{{ url('/Operador/nuevo-requerimiento') }}" type="button" rel="tooltip" title="Nuevo requerimiento" class="btn btn-info btn-simple btn-xs"><i class="fa fa-plus" aria-hidden="true"></i>
+                    </a>
+                    </td>
+                  </tr>
+                  <tr>
+                      <th class="text-center">Id Requerimiento</th>
+                      <th class="text-left">Tipo</th>
+                      <th class="text-left">Fecha Solicitud</th>
+                      <th class="text-left">Hora Solicitud</th>
+                      <th class="text-left">Prioridad</th>
+                      <th class="text-left">Accesible</th>
+                      <th class="text-left">Acciones</th>
+                  </tr>
                 </thead>
                 <tbody>
                 @foreach($rqexaminar as $key => $value) 
@@ -57,7 +61,6 @@
                                 type="button" rel="tooltip" title="Editar Req." class="btn btn-info btn-simple btn-xs">
                           <i class="far fa-edit"></i>
                           </a>
-                            
                       @else
                           <a href="{{ url('/Operador/'.$value->id_requerimiento.'/req-detalle') }}" type="button" rel="tooltip" title="Ver detalle" class="btn btn-success btn-simple btn-xs">
                           <i class="fa fa-eye"></i></a>
