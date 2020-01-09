@@ -187,6 +187,28 @@ Route::post('Verificador/rq-seguimiento','Verificador\ImportantTasksController@r
 //destalle seguimiento
 Route::get('Verificador/{id}/rq-seguimiento','Verificador\ImportantTasksController@rqSegtoDetalle')->name('seguimientoDetalleVeri');
 
+//lista - rq
+Route::get('Verificador/rq-listado','Verificador\ImportantTasksController@rqExaminarList')->name('reqListado');
+//detalle - rq
+Route::get('Verificador/{id}/req-detalle', 'Verificador\ImportantTasksController@rqExaminarDetalle')->name('reqDet');
+
+// Revisar requerimiento
+//lista - rq
+Route::get('Verificador/rq-revisar','Verificador\ImportantTasksController@rqRevisarList')->name('reqRevisarListado');
+// Detalle - rq
+Route::get('Verificador/{id}/rq-revisar-detalle', 'Verificador\ImportantTasksController@rqRevisarDetalle')->name('reqRevisarDet');
+Route::post('Verificador/rq-revisar-detalle','Verificador\ImportantTasksController@rqGuardarRevisar')->name('guardarRevisar');
+
+/**** DESARROLLADOR *****/
+
+Route::get('Desarrollador/rev-asig-inst', 'Desarrollador\ImportantTasksController@revListarAsigInstInstalar')->name('revListarAsigInst');
+Route::post('Desarrollador/search-rev-asig-inst','Desarrollador\ImportantTasksController@searchRevAsigInst')->name('searchRevAsignarInst');
+
+Route::get('Desarrollador/{id}/rev-detalle-asig-inst', 'Desarrollador\ImportantTasksController@revDetalleAsigInst')->name('detalleRevAsigInst');
+
+Route::post('Desarrollador/{id}/rev-guardar-inst','Desarrollador\ImportantTasksController@revGuadarInstalar')->name('guadarRevInstalar');
+
+
 
 
 Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namespace('JefeOperaciones')->group(function () {

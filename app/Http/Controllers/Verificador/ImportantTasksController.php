@@ -1041,5 +1041,154 @@ public function rqSeguimiento(){
 	}
 
 
+	/** requerimientos */
+	public function rqExaminarList(){
+
+   		$rqexaminar = DB::select('SELECT DISTINCT tb_requerimiento.id_requerimiento, tb_requerimiento.tipo, tb_requerimiento.tipo_tarea, tb_requerimiento.fecha_solicitud, tb_requerimiento.hora_solicitud, tb_requerimiento.prioridad, tb_requerimiento.accesible FROM tb_requerimiento 
+   			JOIN tb_cliente ON tb_requerimiento.id_cliente=tb_cliente.id_cliente 
+   			JOIN users ON tb_requerimiento.id_operador=users.id 
+            ORDER BY tb_requerimiento.id_requerimiento ASC');
+
+   		$pagTitulo = "Examinar requerimiento";
+   		$pag = "examinar";
+
+		return view('verificador.rq_examinar_listado')->with(compact('rqexaminar','pagTitulo','pag'));
+
+	//dd($pendInstalar);
+	//$pendInstalar = Paginator::make($pendInstalar, count($pendInstalar), $results_per_page);
+	//$perPage=20;
+    	
+    //    $currentPage = 0;
+    //	$pagedData = array_slice($pendInstalar, $currentPage * $perPage, $perPage);
+    //	$pendInstalar = new \Illuminate\Pagination\LengthAwarePaginator($pagedData, count($pendInstalar), $perPage);
+
+    	//$pendInstalar = collect($pendInstalar1)->get();
+
+    //	return view('verificador.rq_pendientes_instalar')->with(compact('pendInstalar'));
+
+    }
+
+    public function rqExaminarDetalle($id){
+
+		$detalle = DB::table('tb_requerimiento')
+		->join('tb_cliente','tb_requerimiento.id_cliente', '=' , 'tb_cliente.id_cliente')
+		->join('users','tb_requerimiento.id_operador', '=' , 'users.id')
+		->where('tb_requerimiento.id_requerimiento', '=' , $id)
+		->select('id_requerimiento', 'tb_requerimiento.tipo', 
+				 'tb_requerimiento.fecha_solicitud', 'tb_requerimiento.hora_solicitud', 
+				 'tb_requerimiento.prioridad', 'tb_requerimiento.accesible', 
+				 'tb_requerimiento.descripcion', 'tb_requerimiento.resultado', 
+				 'users.name','users.ap_paterno','tb_cliente.nombre')
+		->get();
+
+//		$urlexiste = $this->urlAntes(redirect()->getUrlGenerator()->previous(),'rq-examinar');
+
+		$adjuntos = DB::table('tb_adjuntos')
+		->where('id_requerimiento', '=' , $id)
+		->select('id_adjunto', 'id_requerimiento', 
+				 'id_etapa', 'nombre', 
+				 'fecha', 'hora')
+		->get();
+
+		//agregar nick del mètodo para subir y borrar archivos
+		$nombreFuncion = 'pendDetalle';
+
+			return view('verificador.rq_examinar_detalle')->with(compact('detalle','adjuntos','nombreFuncion'));
+    }
+
+    /** Revisar requerimientos */
+
+	public function rqRevisarList(){
+
+    	$rqexaminar = DB::select("SELECT * FROM tb_requerimiento WHERE accesible='Si' or accesible='Ob' ORDER BY fecha_solicitud ASC");
+
+   		$pagTitulo = "Revisar Requerimiento.";
+   		$pag = "examinar";
+
+		return view('verificador.rq_revisar_listado')->with(compact('rqexaminar','pagTitulo','pag'));
+
+    }
+
+    public function rqRevisarDetalle($id){
+
+    	$detalle = DB::table('tb_requerimiento')
+		->join('tb_cliente','tb_requerimiento.id_cliente', '=' , 'tb_cliente.id_cliente')
+		->join('users','tb_requerimiento.id_operador', '=' , 'users.id')
+		->where('tb_requerimiento.id_requerimiento', '=' , $id)
+		->select('id_requerimiento', 'tb_requerimiento.tipo', 
+				 'tb_requerimiento.fecha_solicitud', 'tb_requerimiento.hora_solicitud', 
+				 'tb_requerimiento.prioridad', 'tb_requerimiento.accesible', 
+				 'tb_requerimiento.descripcion', 'tb_requerimiento.resultado', 
+				 'users.name','users.ap_paterno','tb_cliente.nombre')
+		->get();
+
+//		$urlexiste = $this->urlAntes(redirect()->getUrlGenerator()->previous(),'rq-examinar');
+
+		$adjuntos = DB::table('tb_adjuntos')
+		->where('id_requerimiento', '=' , $id)
+		->select('id_adjunto', 'id_requerimiento', 
+				 'id_etapa', 'nombre', 
+				 'fecha', 'hora')
+		->get();
+
+		//agregar nick del mètodo para subir y borrar archivos
+		$nombreFuncion = 'pendDetalle';
+
+		return view('verificador.rq_revisar_detalle')->with(compact('detalle','adjuntos','nombreFuncion'));
+    
+    }
+
+    public function rqGuardarRevisar(Request $request){
+
+		date_default_timezone_set('America/La_Paz');
+		
+	
+		$aprobacionRq = new AprobacionRq();
+
+		$fecha = date('Y')."-".date('m')."-".date('d');
+		$hora = date('H').":".date('i').":".date('s');
+
+		$aprobacionRq->nro_aprobacion = $request->input('id');
+		$aprobacionRq->id_requerimiento = $request->input('id');
+		$aprobacionRq->fecha_aprobacion = $fecha;
+		$aprobacionRq->hora_aprobacion = $hora;
+		$aprobacionRq->accesible = 'Si';
+
+		if ($aprobacionRq->save()){ 
+				$rqUpdate = Requerimiento::find($request->input('id'));
+
+				if($rqUpdate){
+					$rqUpdate->accesible = 'No';
+					$rqUpdate->save();	
+				}
+
+				return redirect()->route('reqRevisarListado')->with(array(
+				'message' => 'Muchas gracias se aprobo el requerimiento.'));
+				
+		}else{ 
+				$reqUpdate = Requerimiento::find($request->input('id'));
+
+				if($reqUpdate){
+					$reqUpdate->accesible = 'No';
+					$reqUpdate->save();	
+				}
+
+				$apUpdate = AprobacionRq::find($request->input('id'));
+
+				if($apUpdate){
+					$apUpdate->accesible = 'Si';
+					$apUpdate->save();
+				}
+
+				return redirect()->route('reqRevisarListado')->with(array(
+					'error' => 'Error: No se pudo aprobar el requerimiento!. Por favor intente nuevamente.'));
+					
+		}
+
+	//	return view('jefe_operaciones.lista_clientes')->with(compact('listaClientes'));
+
+    }
+
+
 
 }

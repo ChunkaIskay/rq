@@ -89,16 +89,16 @@ window.onload = tiempo;
       @include('menu.menu')
       
       <!-- Divider -->
-      <hr class="sidebar-divider">
+      <!--<hr class="sidebar-divider">-->
 
       <!-- Heading -->
       <div class="sidebar-heading">
-        Añadir complementos
+       <!-- Añadir complementos-->
       </div>
       <!-- Nav Item - Charts -->
-      @include('menu.charts')
+      <!--@@@@@include('menu.charts')-->
       <!-- Nav Item - Tables -->
-      @include('menu.tables')
+      <!----@@@@@@include('menu.tables')--->
       
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
@@ -317,7 +317,7 @@ window.onload = tiempo;
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Sintesis - Requerimientos 2019</span>
+            <span>Copyright &copy; Sintesis - Requerimientos 2019-2020</span>
           </div>
         </div>
       </footer>
