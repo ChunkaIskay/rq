@@ -1356,10 +1356,16 @@ class ImportantTasksController extends Controller
 
     public function listarAsigInstalar(){
 
-		$dateFrom = "";
-		$dateTo = "";
-		$rqAsigIstalar = "";
 
+		date_default_timezone_set('America/La_Paz');
+
+		$dateTo = date('Y-m-d');
+		$calcularFecha = strtotime('-90 day',strtotime($dateTo));
+	    $dateFrom = date('Y-m-d',$calcularFecha);
+	  
+		$rqAsigIstalar = $this->sqlAsigInstalar($dateFrom, $dateTo);
+		
+		
 		return view('jefe_sistemas.rq_asignar_instalar')->with(compact('rqAsigIstalar','dateFrom','dateTo'));
 
     }
