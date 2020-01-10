@@ -1492,14 +1492,18 @@ class ImportantTasksController extends Controller
 		return $lista;
 	}
 
-
 	public function listarAsigSolucionar(){
 
-		$dateFrom = "";
-		$dateTo = "";
-		$rqAsigIstalar = "";
+		date_default_timezone_set('America/La_Paz');
 
-		return view('jefe_sistemas.rq_asignar_solucionar')->with(compact('rqAsigSolucionar','dateFrom','dateTo'));
+		$dateTo = date('Y-m-d');
+		$calcularFecha = strtotime('-90 day',strtotime($dateTo));
+	    $dateFrom = date('Y-m-d',$calcularFecha);
+	  
+		$rqAsigIstalar = $this->sqlAsigSolucionar($dateFrom, $dateTo);
+
+		
+		return view('jefe_sistemas.rq_asignar_solucionar')->with(compact('rqAsigIstalar','dateFrom','dateTo'));
 
     }
 
@@ -1589,7 +1593,7 @@ class ImportantTasksController extends Controller
 	
 			return view('jefe_sistemas.rq_detalle_asig_solucionar')->with(compact('detalle','adjuntos','nombreFuncion','gestor','desarrollador','fecha_plan','id'));
 		}else{
-				return redirect()->route('listaDesa')->with(array(
+				return redirect()->route('rqListarAsigSolu')->with(array(
 					'error' => 'Este requerimiento no puede ser reasignado debido que ya fue desarrollado !. Por favor verifique su req.'));
 		}
 
