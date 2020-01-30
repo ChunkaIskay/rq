@@ -6,10 +6,20 @@ Route::get('/', function () {
 
 Auth::routes();
 
+/******PARA AJAX********/
+/*
+Route::post('miJqueryAjax','AjaxController@index');
+
+Route::post('/', function () {
+   return view('master');
+});
+*/
+
 Route::get('/home', 'HomeController@index')->name('home');
 //Route::get('/menu', array(	'as' => 'menuRol',	'middleware' => 'auth',	'uses' => 'HomeController@index'));
 
 Route::get('/home',  array(	'as' => 'menuRol',	'middleware' => 'auth',	'uses' => 'MenuRolController@index'));
+
 
 //Route::get('/JefeOperaciones/home', 'HomeController@index')->name('home');
 //Route::get('/JefeOperaciones/rqx','Tasks@index');
@@ -208,6 +218,20 @@ Route::get('Desarrollador/{id}/rev-detalle-asig-inst', 'Desarrollador\ImportantT
 
 Route::post('Desarrollador/{id}/rev-guardar-inst','Desarrollador\ImportantTasksController@revGuadarInstalar')->name('guadarRevInstalar');
 
+// revisar requerimiento asignados
+Route::get('Desarrollador/rev-req-asig', 'Desarrollador\ImportantTasksController@revListarReqAsig')->name('revListarReqAsig');
+Route::post('Desarrollador/search-rev-req-asig','Desarrollador\ImportantTasksController@searchReqAsig')->name('searchRevReqAsig');
+
+Route::get('Desarrollador/{id}/rev-req-detalle-asig', 'Desarrollador\ImportantTasksController@revDetalleReqAsig')->name('detalleReqAsig');
+/****Ajax****/
+Route::post('Desarrollador/rev-req-guardar-asig','Desarrollador\ImportantTasksController@revGuadarReqAsig')->name('guadarReqAsig');
+
+Route::post('Desarrollador/rev-req-tiempo-asig','Desarrollador\ImportantTasksController@revAsigTiempoReq')->name('revAsigMostrarDet');
+
+
+
+
+
 
 
 
@@ -326,7 +350,7 @@ Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namesp
 	Route::get('/graficos/search-graficos','SpecialTasksController@reporteAnyDate')->name('rqSearchGraficos');
 	Route::post('/graficos/search-graficos','SpecialTasksController@searchGraficos')->name('rqSearchGraficos');*/
 
-	//tiepo fase requerimientos
+	//tiempo fase requerimientos
 	Route::get('/rq-fase-tiempo','SpecialTasksController@rqFaseTiempo')->name('faseTiempo');
 	Route::get('/search-fase-tiempo','SpecialTasksController@rqSearchFaseTiempo')->name('searchFaseTiempo');
 	Route::post('/search-fase-tiempo','SpecialTasksController@rqSearchFaseTiempo')->name('searchFaseTiempo');

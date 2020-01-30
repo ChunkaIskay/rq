@@ -13,7 +13,7 @@
 	        <table class="table table-bordered"  class="display" id="dataTableAsig" width="100%" cellspacing="0">
 	            <thead>
 	                <tr>
-	                    <th class="text-center">Id Requerimiento</th>
+	                    <th class="text-center">Nro Asignación</th>
 	                    <th class="text-left">Fecha Asignación</th>
 	                    <th class="text-left">Hora Asignación</th>
 	                    <th class="text-left">Fecha Aprobación</th>
@@ -25,7 +25,7 @@
 	        @if(!empty($rqAsignados))	
 	        @foreach($rqAsignados as $key => $value) 
 	          <tr class="table">
-					<td class="text-center">{{ $value->id_requerimiento }}</td>
+					<td class="text-center">{{ $value->Nro_asignacion }}</td>
 					<td>{{ $value->fecha_asignacion }}</td>
 					<td>{{ $value->hora_asignacion }}</td>
 					<td>{{ $value->fecha_aprobacion }}</td>

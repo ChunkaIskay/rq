@@ -857,7 +857,7 @@ class ImportantTasksController extends Controller
 
 	public function paginacionManual($sqlResult){
 
-		$perPage=20;
+		$perPage=100000;
         $currentPage = 0;
     	$pagedData = array_slice($sqlResult, $currentPage * $perPage, $perPage);
     	
@@ -1392,7 +1392,8 @@ class ImportantTasksController extends Controller
 
 			}else{
 
-
+				return redirect()->route('rqPendintes')->with(array(
+						'error' => 'Error: No hay requerimientos pendientes en las fechas seleccionas.!!'));
 			}
 
 		}else{

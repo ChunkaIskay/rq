@@ -158,5 +158,144 @@ class ImportantTasksController extends Controller
 
 	}
 
+	// Revisar req asignados
+
+	public function revListarReqAsig(Request $request){
+	
+		// Datos de la Asignacion del requerimiento
+		
+		$rqAsignados = DB::select('SELECT * FROM tb_asignacion_requerimiento JOIN tb_aprobacion_requerimiento ON tb_asignacion_requerimiento.id_requerimiento=tb_aprobacion_requerimiento.id_requerimiento WHERE tb_asignacion_requerimiento.accesible="Si"');
+
+
+		$pagTitulo = 'Revisar estado de requerimientos';
+	
+		$activo = array(
+			'aprobado' => array('active' => '' , 'show_active' => '' ),
+			'asignado' => array('active' => 'active' , 'show_active' => 'show active' ),  
+			'desarrollo' => array('active' => '' , 'show_active' => '' ),
+			'pruebas' => array('active' => '' , 'show_active' => '' ),
+			'instalacion' => array('active' => '' , 'show_active' => '' ),
+			'certificado' => array('active' => '' , 'show_active' => '' )
+		);
+
+		$arraycodFase = array(  'id_fase1' => 1, 
+								'id_fase2' => 2,
+								'id_fase3' => 3,
+								'id_fase4' => 4,
+								'id_fase5' => 5,
+								'id_fase6' => 6,
+								'id_fase7' => 7,
+								'id_fase8' => 8,
+								'id_fase9' => 9,
+								'id_fase10' => 10 );
+		//$rqAsignadosHisto	ados = $this->paginacionManual($rqAsignados);
+		//$rqAsignadosHisto = $this->paginacionManual($rqAsignadosHisto);
+		$rqAsignadosHisto = array();
+	
+		return view('desarrollador.rq_estado')->with(compact('rqAsignados','rqAsignadosHisto','pagTitulo','activo','arraycodFase'));
+
+	}
+
+	public function revGuadarReqAsig(Request $request)
+	{
+		print_r($request->name);
+
+		echo "im in AjaxController index";//simplemente haremos que devuelva esto
+ 		return response()->json([
+			    'success'   => true,
+			    'message'   => 'Los datos se han guardado correctamente.' //Se recibe en la seccion "success", data.message
+			    ], 200);
+
+ 		return response()->json([
+            'exception' => false,
+            'success'   => false,
+            'message'   => $errors //Se recibe en la sección "error" de tu código JavaScript, y se almacena en la variable "info"
+        ], 422);
+	}
+
+
+	public function revAsigTiempoReq(Request $request)
+	{
+	//	print_r($request->name);
+
+		$rqTiempo = DB::table('tb_tiempos')
+			//->where('id_requerimiento', '=' , $request->name)
+			->where('id_requerimiento', '=' , 324)
+	
+			->select('id_tiempo', 'id_requerimiento', 
+					 'fecha_ini', 'hora_ini',
+					 'fecha_fin', 'hora_fin', 
+					 'fase', 'estado')
+			->get();
+
+
+		foreach ($rqTiempo as $key => $value) {
+			
+			$horaini = explode(":", $value->hora_ini);
+			$horafin = explode(":", $value->hora_fin);
+			$fechaini = explode("-", $value->fecha_ini);
+			$fechafin = explode("-", $value->fecha_fin);
+
+			$hora_ini = $horaini[0].','.$horaini[1].','.$horaini[2];
+			$hora_fin = $horafin[0].','.$horafin[1].','.$horafin[2];
+
+			$fecha_ini = $fechaini[1].','.$fechaini[2].','.$fechaini[0];
+			$fecha_fin = $fechafin[1].','.$fechafin[2].','.$fechafin[0];
+
+			$reqTiempo [] = array(   'hora_ini_0'=>$horaini[0],
+									 'hora_ini_1'=>$horaini[1],
+									 'hora_ini_2'=>$horaini[2],
+									 'hora_fin_0'=>$horafin[0],
+									 'hora_fin_1'=>$horafin[1],
+									 'hora_fin_2'=>$horafin[2],
+									 'fecha_ini_0'=>$fechaini[0],
+									 'fecha_ini_1'=>$fechaini[1],
+									 'fecha_ini_2'=>$fechaini[2],
+									 'fecha_fin_0'=>$fechafin[0],
+									 'fecha_fin_1'=>$fechafin[1],
+									 'fecha_fin_2'=>$fechafin[2]
+							  	  );
+	
+		}
+
+		foreach ($reqTiempo as $key1 => $value1) {
+			
+			$timesIni = mktime($value1['hora_ini_0'],$value1['hora_ini_1'],$value1['hora_ini_2'],  $value1['fecha_ini_1'], $value1['fecha_ini_0'], $value1['fecha_ini_2']);
+			$timesFin = mktime($value1['hora_fin_0'],$value1['hora_fin_1'],$value1['hora_fin_2'],  $value1['fecha_fin_1'], $value1['fecha_fin_0'], $value1['fecha_fin_2']);
+
+			$calculoTime = $timesIni - $timesFin;
+			$cal_hora = $calculoTime / (60 * 60);
+
+			$ca_h[] = abs($calculoTime);
+
+			//obtengo el valor absoulto
+			$cal_hora = abs($cal_hora);
+			//quito los decimales
+			$cal_hora = round($cal_hora);
+			$calculo_hora[]=$cal_hora;
+			
+		}
+
+		$sumaCalculo=0;
+		foreach ($ca_h as $key2 => $value2) {
+			$sumaCalculo += $value2;
+		}
+
+		$hora_calculada = date('H:i:s', $sumaCalculo);
+	
+		//echo "im in AjaxController index";//simplemente haremos que devuelva esto
+ 		return response()->json([
+			    'success'   => true,
+			    'hora_calculada' => $hora_calculada,
+			    'message'   => 'Los datos se han guardado correctamente.' //Se recibe en la seccion "success", data.message
+			    ], 200);
+
+ 		return response()->json([
+            'exception' => false,
+            'success'   => false,
+            'message'   => $errors //Se recibe en la sección "error" de tu código JavaScript, y se almacena en la variable "info"
+        ], 422);
+	}
+	
 
 }
