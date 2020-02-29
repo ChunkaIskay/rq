@@ -488,7 +488,7 @@ class SpecialTasksController extends Controller
 
      public function rqSearchFaseTiempo(Request $request){
 
-//$this->validate($request, Operador::$rules, Operador::$messages);
+		//$this->validate($request, Operador::$rules, Operador::$messages);
      	$dateFrom = $request->dateFrom;
 		$dateTo = $request->dateTo;
 

@@ -176,7 +176,7 @@ Route::post('Operador/guardar-req','Operador\ImportantTasksController@guardarReq
 
 // subir archivo
 Route::post('Operador/subir-archivo','Operador\ImportantTasksController@uploadFile')->name('subirArchivo');
-	Route::post('Operador/delete-file','Operador\ImportantTasksController@deleteFile')->name('deleteFileOpe');
+Route::post('Operador/delete-file','Operador\ImportantTasksController@deleteFile')->name('deleteFileOpe');
 
 /*************** Verificador **************/
 
@@ -223,14 +223,22 @@ Route::get('Desarrollador/rev-req-asig', 'Desarrollador\ImportantTasksController
 Route::post('Desarrollador/search-rev-req-asig','Desarrollador\ImportantTasksController@searchReqAsig')->name('searchRevReqAsig');
 
 Route::get('Desarrollador/{id}/rev-req-detalle-asig', 'Desarrollador\ImportantTasksController@revDetalleReqAsig')->name('detalleReqAsig');
-/****Ajax****/
+
+/**** ajax tiempo de desrrollo ****/
 Route::post('Desarrollador/rev-req-guardar-asig','Desarrollador\ImportantTasksController@revGuadarReqAsig')->name('guadarReqAsig');
 
 Route::post('Desarrollador/rev-req-tiempo-asig','Desarrollador\ImportantTasksController@revAsigTiempoReq')->name('revAsigMostrarDet');
 
+Route::post('Desarrollador/rev-req-tiempo-val','Desarrollador\ImportantTasksController@revValidarRq')->name('revValidarReq');
+/***** ajax solución a tarea  *****/
+
+Route::post('Desarrollador/rev-req-solucion-tarea','Desarrollador\ImportantTasksController@revSolucionTarea')->name('revSolTarea');
 
 
+/***** Download*****/
 
+Route::post('Desarrollador/subir-archivo','Desarrollador\ImportantTasksController@uploadFile')->name('subirArchivo');
+Route::post('Desarrollador/delete-file','Desarrollador\ImportantTasksController@deleteFile')->name('deleteFileDesa');
 
 
 

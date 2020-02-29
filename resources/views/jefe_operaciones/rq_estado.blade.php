@@ -60,7 +60,7 @@
 				<div class="card-body">
 					<form action="{{ url('/JefeOperaciones/rq-estado-all') }}"  method="post"  enctype="multipart/form-data" class="navbar-form navbar-left" >
 						 {{ csrf_field() }}
-						<h4>Presisione el boton 'Ver listados'.!</h4>
+						<h4>Presione el boton 'Ver listados'.!</h4>
 						
 						<button type="submit" class="btn btn-info">
 							<span >Ver listado</span>
@@ -74,7 +74,7 @@
 				<div class="card-body">
 					<form action="{{ url('/JefeOperaciones/rq-estado-all-asig') }}"  method="post"  enctype="multipart/form-data" class="navbar-form navbar-left" >
 						 {{ csrf_field() }}
-						<h4>Presisione el boton 'Ver listados'.!</h4>
+						<h4>Presione el boton 'Ver listados'.!</h4>
 						
 						<button type="submit" class="btn btn-info">
 							<span >Ver listado</span>
@@ -88,7 +88,7 @@
 				<div class="card-body">
 					<form action="{{ url('/JefeOperaciones/rq-estado-all-desa') }}"  method="post"  enctype="multipart/form-data" class="navbar-form navbar-left" >
 						 {{ csrf_field() }}
-						<h4>Presisione el boton 'Ver listados'.!</h4>
+						<h4>Presione el boton 'Ver listados'.!</h4>
 						
 						<button type="submit" class="btn btn-info">
 							<span >Ver listado</span>
@@ -102,7 +102,7 @@
 				<div class="card-body">
 					<form action="{{ url('/JefeOperaciones/rq-estado-all-pruebas') }}"  method="post"  enctype="multipart/form-data" class="navbar-form navbar-left" >
 						 {{ csrf_field() }}
-						<h4>Presisione el boton 'Ver listados'.!</h4>
+						<h4>Presione el boton 'Ver listados'.!</h4>
 						
 						<button type="submit" class="btn btn-info">
 							<span >Ver listado</span>
@@ -116,7 +116,7 @@
 				<div class="card-body">
 					<form action="{{ url('/JefeOperaciones/rq-estado-all-inst') }}"  method="post"  enctype="multipart/form-data" class="navbar-form navbar-left" >
 						 {{ csrf_field() }}
-						<h4>Presisione el boton 'Ver listados'.!</h4>
+						<h4>Presione el boton 'Ver listados'.!</h4>
 						
 						<button type="submit" class="btn btn-info">
 							<span >Ver listado</span>
@@ -130,7 +130,7 @@
 				<div class="card-body">
 					<form action="{{ url('/JefeOperaciones/rq-estado-all-cert') }}"  method="post"  enctype="multipart/form-data" class="navbar-form navbar-left" >
 						 {{ csrf_field() }}
-						<h4>Presisione el boton 'Ver listados'.!</h4>
+						<h4>Presione el boton 'Ver listados'.!</h4>
 						<button type="submit" class="btn btn-info">
 							<span >Ver listado</span>
 						</button>

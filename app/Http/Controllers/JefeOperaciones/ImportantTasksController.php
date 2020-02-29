@@ -1201,7 +1201,7 @@ class ImportantTasksController extends Controller
 										  'fase_actual' => $faseActual['aceptacion_cliente']
 										)
 							);
-		//$pendInstalar = collect($pendInstalar1)->get();
+		
 		//agregar nick del mètodo para subir y borrar archivos
 
 		$nombreFuncion = 'pendDetalle';
