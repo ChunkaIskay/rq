@@ -35,7 +35,7 @@ hr {
 	<div class="card shadow mb-4">
 	  <!-- Card Header - Accordion -->
 	  <a href="#asig" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="asig">
-	    <h6 class="m-0 font-weight-bold text-primary">Lista de requerimiento asignados a desarrollo</h6>
+	    <h6 class="m-0 font-weight-bold text-primary">Lista de requerimientos para sus respectivas Pruebas</h6>
 	  </a> 
 	  <!-- Card Content - Collapse -->
 	  <!--<div class="collapse show" id="asig">-->
@@ -44,8 +44,8 @@ hr {
 	    <div class="card-body">
 	    <div class="row text-left">
 		  <div class="col-4 text-leeft"> <label>Asignación</label></div>
-		  <div class="col-4 text-leeft"> <label>Desarrollo</label></div>
-		  <div class="col-4 text-leeft"> <label>Prueba</label></div>
+		  <div class="col-4 text-leeft"> <label>Pruebas</label></div>
+		  <div class="col-4 text-leeft"> <label>Certificado</label></div>
 		</div>
 		
 		<div class="table-responsive border border-warning" id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">	        
@@ -88,9 +88,7 @@ hr {
 	  </div>
 	</div>
 	<br> 
-
 	<!--<a id="mostrar_1" onclick="showDiv('mostrar',1 )"  style="cursor:pointer;">datosss</a>-->
-
         <!-- Cantidad de horas trabajadas. -->
     @foreach($rqAsig as $key => $value1) 
     	@if($req_id == $value1->id_requerimiento)
@@ -253,6 +251,45 @@ hr {
                      <strong>{{ $value1->asig_a }}</strong>
                   </div>
             </div>
+            <hr>
+            <div class="row">
+               <div class="col-lg-12 text-center">  
+                    <h5>Datos de la Solución al requerimiento</h5>
+                  </div>  
+                  <div class="col-lg-3">
+                    Fecha de Solución
+                  </div>
+                  <div class="col-lg-2 text-left">  
+                     <strong>{{ $value1->fecha_fin }}</strong>
+                  </div>
+                  <div class="col-lg-3">  
+                    Hora de Solución
+                  </div>
+                  <div class="col-lg-4 text-left">  
+                     <strong>{{ $value1->hora_fin }}</strong>
+                  </div>
+                  
+                  <div class="col-lg-3">
+                    Responsable de la Solución
+                  </div>
+                  <div class="col-lg-2 text-left">  
+                     <strong>{{ $value1->asig_a }}</strong>
+                  </div>
+                  <div class="col-lg-3">  
+                    Nro Secuencia
+                  </div>
+                  <div class="col-lg-4 text-left">  
+                     <strong>{{ $value1->secuencia }}</strong>
+                  </div>
+                  <div class="col-lg-3">
+                    Descripción de la Solución
+                  </div>
+                  <div class="col-lg-9 text-left">  
+                     <strong>{{ $value1->descripcion }}</strong>
+                  </div>
+            </div>
+            <hr>                  
+            @include('operador.listado_adjunto_cert')
             <br>
             <br>
             <div class="row">
@@ -268,11 +305,11 @@ hr {
               </div>
             <br>
             <br>
-            @include('desarrollador.subir_adjunto')
+            @include('operador.subir_adjunto_cert')
             <div class="row">
               <div class="col-lg-6 text-right">  
                 <div class="my-2"></div>
-                  <a class="btn btn-primary" href="{{ route('revListarReqAsig') }}">
+                  <a class="btn btn-primary" href="{{ route('reqListarCert') }}">
                   Cerrar ventana
                   </a>
               </div>
@@ -295,17 +332,17 @@ hr {
               <form id="logout-form1_{{ $value1->id_requerimiento }}" action="" method="POST" >
                   {{ csrf_field() }}
               	  <div class="col-lg-12">
-	                  Descripción
+	                  Detalle de la certificación
 			              </div>
 	              <div class="col-lg-12 text-left">  
 	                  <textarea class="form-control"  rows="4" id="textDesc_{{ $value1->id_requerimiento }}" placeholder="Escriba el comentarios en detalle por favor!"></textarea>
 	              </div>
-	             <!-- <div class="col-lg-12">
-	                  Programas Clientes(Opcional)
-			      </div>
+	              <div class="col-lg-12">
+	                  Programas de las funcionalidades
+			         </div>
 	              <div class="col-lg-12 text-left">  
-	                  <textarea class="form-control"  rows="4" id="textClient_{{ $value1->id_requerimiento }}" placeholder="Escriba el comentarios en detalle por favor!"></textarea>
-	              </div>
+	                  <textarea class="form-control"  rows="4" id="text2_{{ $value1->id_requerimiento }}" placeholder="Escriba el comentarios en detalle por favor!"></textarea>
+	              </div><!--
 	              <div class="col-lg-12">
 	                  Progamas Servidores(Opcional)
 			              </div>
@@ -367,7 +404,7 @@ hr {
                     Eliminar Archivo
               </a>
               <div class="modal-body">
-              <form id="logout-form1" action="{{ route('deleteFileDesa') }}" method="POST" style="display: none;">
+              <form id="logout-form1" action="{{ route('deleteFileOpe') }}" method="POST" style="display: none;">
                   {{ csrf_field() }}
                   <input type="hidden" name="id requerimiento" value="">
                   <input type="hidden" name="nombreFuncion" value="{{ $nombreFuncion }}">
@@ -404,7 +441,7 @@ function drop(ev) {
 
 	$.ajax({
 	    type:"POST",
-	    url:"{{route('guadarReqAsig')}}",
+	    url:"{{route('guadarReqAsigCert')}}",
 	    data:{'name': data1},
 	 //  data: $("#drag_{{ $value->id_requerimiento }}").serialize(),
 	    dataType : 'html',
@@ -448,10 +485,10 @@ function drop(ev) {
 	var inicio=0;
 	var timeout=0;
 	var horas_cal = 0;
-    var minutos_cal = 0;
-    var segundos_cal = 0;
-    var horas_inicial = 0;
-    var anioo = 0;
+  var minutos_cal = 0;
+  var segundos_cal = 0;
+  var horas_inicial = 0;
+  var anioo = 0;
 	var mess = 0;
 	var diaa = 0;
 	var id_rq = 0;
@@ -480,7 +517,7 @@ function drop(ev) {
 
  		if(timeout==0)
 		{ 
-			if(tiempo_i==0){  //alert('388');
+			if(tiempo_i==0){  
 				mostrarDetalle(idReq,'insert',0);
 				// INICIAR TAREA el cronometro
 	 			elemento.value="DETENER TAREA";
@@ -616,10 +653,13 @@ function mostrarDetalle(idReq,accion,tiempo_i){
 	if(accion=='updateI'){
 		tiempoId=document.getElementById('tiempo_i_'+idReq).value;
 	}
+console.log(idReq);
+console.log(accion);
+console.log(tiempo_i);
 
 	$.ajax({
 		    type:"POST",
-		    url:"{{route('revAsigMostrarDet')}}",
+		    url:"{{route('revAsigMostrarDetCert')}}",
 		    data:{'name': idReq,'accion':accion,'tiempo_id':tiempoId},
 	        dataType : 'html',
 		    success: function(data){
@@ -646,7 +686,7 @@ function mouseDown(idReq,accion,tiempo_i) {
 
 		$.ajax({
 					type: "POST",
-			        url: "{{route('revValidarReq')}}",
+			        url: "{{route('revValidarReqCert')}}",
 			        data: {'name': idReq,'accion':accion,'tiempo_id':tiempo_i},
 			        dataType : 'html',
 			       
@@ -705,17 +745,16 @@ if(id_reqq != 0){
 	if(document.getElementById('mostrar_'+id_reqq).parentNode.nodeName=='DIV'){
 		  
 		 var texto_desc=document.getElementById('textDesc_'+id_reqq).value;
-		 /*var texto_cliente=document.getElementById('textClient_'+id_reqq).value;
-		 var texto_servidores=document.getElementById('textServ_'+id_reqq).value;
+		 var texto_2=document.getElementById('text2_'+id_reqq).value;
+		 /*var texto_servidores=document.getElementById('textServ_'+id_reqq).value;
 		 var texto_tabla=document.getElementById('textModi_'+id_reqq).value;*/
-		 var texto_cliente='';
 		 var texto_servidores='';
 		 var texto_tabla='';
 
 		$.ajax({
 			type: "POST",
-	        url: "{{route('revSolTarea')}}",
-	        data: {'idRq': id_reqq,'accion':'insert','tiempo_id':'','texto_desc':texto_desc,'texto_cliente':texto_cliente,'texto_servidores':texto_servidores,'texto_tabla':texto_tabla},
+	        url: "{{route('revSolTareaCert')}}",
+	        data: {'idRq': id_reqq,'accion':'insert','tiempo_id':'','texto_desc':texto_desc,'texto_2':texto_2,'texto_servidores':texto_servidores,'texto_tabla':texto_tabla},
 	        dataType : 'html',
 	       
 		    success: function(data){

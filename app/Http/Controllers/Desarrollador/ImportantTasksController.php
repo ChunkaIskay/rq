@@ -169,12 +169,9 @@ class ImportantTasksController extends Controller
 		return $lista;
 
 	}
-
 	// Revisar req asignados
-
 	public function revListarReqAsig(Request $request){
        
-       // print_r($_GET);
         $req_id = 0;
         if(!empty($_GET)){
 	        foreach ($_GET as $key => $value) {
@@ -243,9 +240,6 @@ class ImportantTasksController extends Controller
 							);
 				}
 	    	}
-		
-
-		//dd($rqAsignados);
 
 		$activo = array(
 			'aprobado' => array('active' => '' , 'show_active' => '' ),
@@ -334,18 +328,15 @@ class ImportantTasksController extends Controller
 
 	public function revGuadarReqAsig(Request $request)
 	{
-		//print_r($request->name);
-
-		echo "im in AjaxController index";//simplemente haremos que devuelva esto
- 		return response()->json([
+		return response()->json([
 			    'success'   => true,
-			    'message'   => 'Los datos se han guardado correctamente.' //Se recibe en la seccion "success", data.message
+			    'message'   => 'Los datos se han guardado correctamente.' 
 			    ], 200);
 
  		return response()->json([
             'exception' => false,
             'success'   => false,
-            'message'   => $errors //Se recibe en la sección "error" de tu código JavaScript, y se almacena en la variable "info"
+            'message'   => $errors 
         ], 422);
 	}
 
@@ -420,27 +411,10 @@ class ImportantTasksController extends Controller
 			}
 
 		}
-/*
-		$arrayTiempoFin = array();
 
-		foreach ($rqAsignados as $keyt => $valuet){
-
-			$tiempo = DB::select('SELECT * FROM tb_tiempos WHERE id_requerimiento = :id', ['id' => $valuet->id_requerimiento]);
-
-			if($tiempo){
-		    	if($tiempo[0]->fase == 'desarrollo' and $tiempo[0]->estado == 'I'){
-	             	
-		    		$arrayTiempoFin[] =  array(
-		    									'id_tp'=> $tiempo[0]->id_tiempo,
-		    									'id_rq'=> $tiempo[0]->id_requerimiento,
-		    									'f_ini'=> $tiempo[0]->fecha_ini,
-		    									'h_ini'=> $tiempo[0]->hora_ini
-		    									);
-		    	}
-	    	}
-		}*/
 	$rqTiempo = DB::table('tb_tiempos')
 		->where('id_requerimiento', '=' , $request->name)
+		//->where('id_requerimiento', '=' , 3795)
 		->where('estado', '=' , 'F')
 		->select('id_tiempo', 'id_requerimiento', 
 				 'fecha_ini', 'hora_ini',
@@ -459,7 +433,6 @@ class ImportantTasksController extends Controller
 			}
 		 }
 
-	//echo "im in AjaxController index";//simplemente haremos que devuelva esto
 		return response()->json([
 		    'success'   => true,
 		    'hora_calculada' => $hora_calculada,
@@ -475,7 +448,9 @@ class ImportantTasksController extends Controller
 	}
 
 	public function calculoTiempo($arrayTiempo){
-
+		
+		date_default_timezone_set('America/La_Paz');
+		
 		foreach ($arrayTiempo as $key => $value) {
 			
 			$horaini = explode(":", $value->hora_ini);
@@ -483,21 +458,18 @@ class ImportantTasksController extends Controller
 			$fechaini = explode("-", $value->fecha_ini);
 			$fechafin = explode("-", $value->fecha_fin);
 
-			$hora_ini = $horaini[0].','.$horaini[1].','.$horaini[2];
-			$hora_fin = $horafin[0].','.$horafin[1].','.$horafin[2];
-
-			$fecha_ini = $fechaini[1].','.$fechaini[2].','.$fechaini[0];
-			$fecha_fin = $fechafin[1].','.$fechafin[2].','.$fechafin[0];
-
 			$reqTiempo [] = array(   'hora_ini_0'=>$horaini[0],
 									 'hora_ini_1'=>$horaini[1],
 									 'hora_ini_2'=>$horaini[2],
+
 									 'hora_fin_0'=>$horafin[0],
 									 'hora_fin_1'=>$horafin[1],
 									 'hora_fin_2'=>$horafin[2],
+									 
 									 'fecha_ini_0'=>$fechaini[0],
 									 'fecha_ini_1'=>$fechaini[1],
 									 'fecha_ini_2'=>$fechaini[2],
+									 
 									 'fecha_fin_0'=>$fechafin[0],
 									 'fecha_fin_1'=>$fechafin[1],
 									 'fecha_fin_2'=>$fechafin[2]
@@ -506,31 +478,24 @@ class ImportantTasksController extends Controller
 		}
 
 		foreach ($reqTiempo as $key1 => $value1) {
+			// mktime(horas, minutos, segundo, Mes,dia, Año);
+			$timesIni = mktime($value1['hora_ini_0'],$value1['hora_ini_1'],$value1['hora_ini_2'],  $value1['fecha_ini_1'], $value1['fecha_ini_2'], $value1['fecha_ini_0']);
+			$timesFin = mktime($value1['hora_fin_0'],$value1['hora_fin_1'],$value1['hora_fin_2'],  $value1['fecha_fin_1'],$value1['fecha_fin_2'],$value1['fecha_fin_0']);
 			
-			$timesIni = mktime($value1['hora_ini_0'],$value1['hora_ini_1'],$value1['hora_ini_2'],  $value1['fecha_ini_1'], $value1['fecha_ini_0'], $value1['fecha_ini_2']);
-			$timesFin = mktime($value1['hora_fin_0'],$value1['hora_fin_1'],$value1['hora_fin_2'],  $value1['fecha_fin_1'], $value1['fecha_fin_0'], $value1['fecha_fin_2']);
-
-			$calculoTime = $timesIni - $timesFin;
-			$cal_hora = $calculoTime / (60 * 60);
-
-			$ca_h[] = abs($calculoTime);
-
-			//obtengo el valor absoulto
-			$cal_hora = abs($cal_hora);
-			//quito los decimales
-			$cal_hora = round($cal_hora);
-			$calculo_hora[]=$cal_hora;
+	    	$calculoTime[] = abs($timesFin - $timesIni);
+			
+		}
+	
+		$horas = array();
+		$hora_calculada = array();
+		$suma_h = array();
+		
+		foreach($calculoTime as $key => $segs){
+			$convertir_smh =  $this->convertir_seg_min_horas($segs);
+			$suma_h = $this->suma_horas($convertir_smh,$suma_h);
 		}
 
-		$sumaCalculo=0;
-		foreach ($ca_h as $key2 => $value2) {
-			$sumaCalculo += $value2;
-		}
-
-		$hora_calculada = date('H:i:s', $sumaCalculo);
-
-		return $hora_calculada;
-
+		return $suma_h;
 	}
 
 	
@@ -685,8 +650,7 @@ class ImportantTasksController extends Controller
 
     public function revSolucionTarea(Request $request){
 
-/*    	$last = DB::table('tb_solucion_requerimiento')->orderBy('id_solucion','DESC')->first();
- 		$ulitmaSolucion = $last->id_tiempo + 1;*/
+
  		$rqTiempo = DB::table('tb_tiempos')
 			->where('id_requerimiento', '=' , $request->idRq)
 			->select('id_tiempo', 'id_requerimiento', 
@@ -695,6 +659,10 @@ class ImportantTasksController extends Controller
 					 'fase', 'estado')
 			->orderBy('id_tiempo','ASC')
 			->get();
+
+		$request->texto_cliente ='';
+		$request->texto_servidores =''; 
+		$request->texto_tabla ='';
 
  		$SolucionRq = new SolucionRq();
 		$fecha = date('Y')."-".date('m')."-".date('d');
@@ -712,7 +680,6 @@ class ImportantTasksController extends Controller
 		$SolucionRq->prog_servidores = $request->texto_servidores; 
 		$SolucionRq->tablas_mod = $request->texto_tabla;
 		$SolucionRq->accesible = 'Si';
-		//dd($SolucionRq);
 		
 		if($SolucionRq->save()){
 			$rqAsignacion = AsignacionReq::find($request->idRq);
@@ -732,5 +699,75 @@ class ImportantTasksController extends Controller
 			        ], 421);
 			 }
     }
+
+
+    private function suma_horas($hrs1,$hrs2){
+
+    	$hora1=explode(":",$hrs1);
+
+    	if(!empty($hrs2)){
+    		$hora2=explode(":",$hrs2);
+			$calculo_hms = $this->sumar_hra_min_seg($hora1[2],$hora1[1],$hora1[0],$hora2[2],$hora2[1],$hora2[0]); 
+	    }else{
+  			$calculo_hms = $this->sumar_hra_min_seg($hora1[2],$hora1[1],$hora1[0],0,0,0); 
+	    }
+
+	    return $calculo_hms;
+
+	}
+
+	public function contador_seg_min($seg_min,$temp){
+	    
+	    while($seg_min>=60){
+	        $seg_min=$seg_min-60;
+	        $temp++;
+	    }
+	    $hms = array('temp' => $temp, 'seg_min'=> $seg_min);
+	    return $hms;
+	
+	}
+
+	public function sumar_hra_min_seg($seg1,$min1,$hrs1,$seg2,$min2,$hrs2){
+
+		$temp=0;
+		$hms = array();
+		$hms['temp']=0;
+		$segundos=(int)$seg1+(int)$seg2;
+		$hms= $this->contador_seg_min($segundos,$hms['temp']);
+		$segundos =$hms['seg_min'];
+		//sumo minutos 
+		$minutos=(int)$min1+(int)$min2+$hms['temp'];
+		$temp=0;
+		$hms['temp']=0;
+		$hms= $this->contador_seg_min($minutos,$hms['temp']);
+		$minutos =$hms['seg_min'];
+		//sumo horas 
+		$horas=(int)$hrs1+(int)$hrs2+$hms['temp'];
+
+		if($horas<10)
+			$horas= '0'.$horas;
+
+		if($minutos<10)
+			$minutos= '0'.$minutos;
+
+		if($segundos<10)
+			$segundos= '0'.$segundos;
+
+		$sumar_hms = $horas.':'.$minutos.':'.$segundos;
+
+		return $sumar_hms;
+
+	}
+
+	public function convertir_seg_min_horas($seds) {
+
+		$horas = floor($seds / 3600);
+		$minutos = floor(($seds - ($horas * 3600)) / 60);
+		$segundos = $seds - ($horas * 3600) - ($minutos * 60);
+		
+		return $horas . ':' . $minutos . ":" . $segundos;
+	}
+
+	
 
 }

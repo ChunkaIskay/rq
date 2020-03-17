@@ -132,7 +132,6 @@ es: "Elegir"
             </div>
             <br>
             <div class="row">
-
                   <div class="col-lg-3">  
                     Descripción
                   </div>
@@ -160,7 +159,7 @@ es: "Elegir"
   </div>
        
 </div>
-        <!-- /.container-fluid -->
+<!-- /.container-fluid -->
   <!-- Logout Modal-->
   <div class="modal fade" id="logoutModalApro" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">

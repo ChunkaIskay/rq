@@ -15,8 +15,13 @@
                                 <a href="#" type="submit" class="btn btn-success btn-circle btn-sm">
                                     <i class="fas fa-upload"></i></a>
                           </div>-->
-                          <input type="hidden" name="idrq" value="{{ $adjuntoSol[0]->id_requerimiento }}">
-                          <input type="hidden" name="etapa" value="{{ $adjuntoSol[0]->id_etapa }}">
+                          <input type="hidden" name="idrq" value="{{ $detalle[0]->id_requerimiento }}">
+                          @if(empty($adjuntoSol[0]->id_etapa))
+                            <input type="hidden" name="etapa" value="4">
+                          @else
+                            <input type="hidden" name="etapa" value="{{ $adjuntoSol[0]->id_etapa }}">
+                          @endif 
+
                           <input type="hidden" name="nombreFuncion" value="{{ $nombreFuncion }}">
                         <div class="col-lg-8 text-left"> 
                               <input class="boton-buscar" type="file" name="rqdoc">

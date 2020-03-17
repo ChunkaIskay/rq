@@ -419,9 +419,11 @@ es: "Elegir"
                            document.getElementById('logout-form').submit();">
                   Aprobar Requerimiento
               </a>
-              <form id="logout-form" action="{{ route('aprobarPendiente') }}" method="POST" style="display: none;">
+              <form id="logout-form" action="{{ route('aprobarPendiente1') }}" method="POST" style="display: none;">
                   {{ csrf_field() }}
                   <input type="hidden" name="id" value="{{ $detalle[0]->id_requerimiento }}">
+                  <textarea class="form-control" name="desc_instal" rows="3" id="desc_instal" placeholder="Descripción del la aprobación " name="text"></textarea>
+
               </form>
         </div>
       </div>

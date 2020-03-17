@@ -178,6 +178,19 @@ Route::post('Operador/guardar-req','Operador\ImportantTasksController@guardarReq
 Route::post('Operador/subir-archivo','Operador\ImportantTasksController@uploadFile')->name('subirArchivo');
 Route::post('Operador/delete-file','Operador\ImportantTasksController@deleteFile')->name('deleteFileOpe');
 
+// Certificaciones Pre-intalación Soluciones de req. a ser certifición
+Route::get('Operador/certificaciones', 'Operador\ImportantTasksController@reqListarCertificaciones')->name('reqListarCert');
+
+/**** ajax tiempo de pruebas ****/
+Route::post('Operador/rev-req-guardar-asig','Operador\ImportantTasksController@revGuadarReqAsig')->name('guadarReqAsigCert');
+
+Route::post('Operador/rev-req-tiempo-asig','Operador\ImportantTasksController@revAsigTiempoReq')->name('revAsigMostrarDetCert');
+
+Route::post('Operador/rev-req-tiempo-val','Operador\ImportantTasksController@revValidarRq')->name('revValidarReqCert');
+/***** ajax solución a tarea  *****/
+Route::post('Operador/rev-req-solucion-tarea','Operador\ImportantTasksController@revSolucionTarea')->name('revSolTareaCert');
+
+
 /*************** Verificador **************/
 
 // Lista de depurar req
@@ -231,8 +244,8 @@ Route::post('Desarrollador/rev-req-tiempo-asig','Desarrollador\ImportantTasksCon
 
 Route::post('Desarrollador/rev-req-tiempo-val','Desarrollador\ImportantTasksController@revValidarRq')->name('revValidarReq');
 /***** ajax solución a tarea  *****/
-
 Route::post('Desarrollador/rev-req-solucion-tarea','Desarrollador\ImportantTasksController@revSolucionTarea')->name('revSolTarea');
+
 
 
 /***** Download*****/

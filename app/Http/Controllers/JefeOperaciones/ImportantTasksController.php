@@ -12,10 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 use App\AprobacionRq;
 use App\Requerimiento;
 use App\Adjunto;
+use App\AsigInstalDesc;
+use App\AsigInstalReq;
 use File;
 
 use Illuminate\Support\Collection as Collection;
-
 
 
 class ImportantTasksController extends Controller
@@ -115,7 +116,7 @@ class ImportantTasksController extends Controller
     }
 
     public function aprobarRqPen(Request $request){
-
+    	
        // $this->validate($request, Contract::$rules, Contract::$messages);
 		$aprobacionExiste = AprobacionRq::find($request->input('id'));
 		
@@ -1766,7 +1767,6 @@ class ImportantTasksController extends Controller
 
 		$objPendietes = $arrayP;
 
-	//	dd($objPendietes);
 		return $objPendietes;	
 	}
 
@@ -1786,10 +1786,41 @@ class ImportantTasksController extends Controller
 
 		return $lista;
 	}
-	
 
-	
+	public function aprobarRqAsigInstalarDesc(Request $request){
 
 
+       // $this->validate($request, Contract::$rules, Contract::$messages);
+		$aprobacionExiste = AsigInstalDesc::find($request->input('id'));
+		
+		if($aprobacionExiste){
+			return redirect()->route('rqPendientes')->with(array(
+    		'error' => 'Error: El querimiento ya esta aprobado.!!'
+    		));
+		}else{
+				$aprobacion = new AsigInstalDesc();
+				$fecha = date('Y')."-".date('m')."-".date('d');
+				$hora = date('H').":".date('i').":".date('s');
+				$aprobacion->idSol = $request->input('id');
+				$aprobacion->idReq = $request->input('id');
+				$aprobacion->desc = $request->input('desc_instal');
+				$aprobacion->fecha_instal_aprob = $fecha;
+				$aprobacion->hora_instal_aprob = $hora;
+				
+				
+				if (!$aprobacion->save()){
+					return redirect()->route('pendienteInstalar')->with(array(
+						'error' => 'Error: El requerimiento no fue aprobado, consulte con el administrador.!!'
+					));
+				}else{
+						$rqUpdate = AsigInstalReq::find($request->input('id'));
+						$rqUpdate->accesible = 'Si';
+						$rqUpdate->save();
+
+					return redirect()->route('pendienteInstalar')->with(array(
+						'message' => 'Gracias! El requermiento fue aprobodo con exito.'));
+				}
+			}
+    }
 
 }

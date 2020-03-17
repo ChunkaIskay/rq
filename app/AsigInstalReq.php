@@ -22,9 +22,6 @@ class AsigInstalReq extends Model
             'desarrollador.between' => 'Seleccione un desarrollador por favor.',
             'desarrollador.min' => 'Seleccione un desarrollador por favor.',
             'desarrollador.max' => 'Seleccione un desarrollador por favor.',
-
-      
-
     ];
 
     public static $rules = [

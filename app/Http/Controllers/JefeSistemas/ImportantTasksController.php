@@ -42,6 +42,12 @@ class ImportantTasksController extends Controller
 
 	public function rqDetalleAprob($id){
 
+		if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$user = \Auth::user();
+
 		$detalle = DB::table('tb_requerimiento')
 		->join('tb_cliente','tb_requerimiento.id_cliente', '=' , 'tb_cliente.id_cliente')
 		->join('users','tb_requerimiento.id_operador', '=' , 'users.id')
@@ -62,7 +68,7 @@ class ImportantTasksController extends Controller
 			->get();
 
 		// rol de usuario jefe de sistemas = 3
-		$gestor = $this->listUserRol(3);
+		$gestor = $this->listUserRol(3,$user->id);
 		
 		// rol de usuario desarrollador = 2
 		$desarrollador = $this->listUserRol(2);
@@ -243,6 +249,12 @@ class ImportantTasksController extends Controller
     	$adjuntos = "";
     	$adjuntoSol = "";
 
+    	if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$user = \Auth::user();
+
 		$detalle = DB::select('SELECT air.id_certificacion,air.id_solucion, air.id_operador
 			,air.fecha_certificacion,air.hora_certificacion,air.accesible cert_acces, air.detalle_certificacion, air.detalle_funcionalidades,
 			sr.id_asignacion,sr.secuencia,sr.fecha_inicio,sr.hora_inicio,sr.fecha_fin,sr.hora_fin,
@@ -304,6 +316,8 @@ class ImportantTasksController extends Controller
 
 			$adjuntoSol =  DB::select('SELECT * FROM tb_adjuntos where id_etapa = 4 and id_requerimiento = :id', ['id' => $idrq]);
 
+//dd($adjuntoSol);
+
 			 // Datos de la certificacion Pre-instalacion
 				
 			$adjuntoCertiPreInst = DB::table('tb_adjuntos')
@@ -334,7 +348,7 @@ class ImportantTasksController extends Controller
 			$nombreController = 'JefeSistemas';
 
 			// rol de usuario jefe de sistemas = 3
-			$gestor = $this->listUserRol(3);	
+			$gestor = $this->listUserRol(3,$user->id);	
 			// rol de usuario desarrollador = 2
 			$desarrollador = $this->listUserRol(2);
 			$id = $idrq;
@@ -343,15 +357,26 @@ class ImportantTasksController extends Controller
 
 	}
 
-	public function listUserRol($id){
+	public function listUserRol($id,$iduse=0){
 
-		$listado = DB::table('users')
+		if($iduse!=0){
+			$listado = DB::table('users')
 			->join('role_user', 'users.id','=','role_user.user_id')
 			->join('roles', 'role_user.role_id','=','roles.id')
+			->where('users.id', '=' , $iduse)
 			->where('roles.id', '=' , $id)
 			->where('users.activo', '=' , 'Si')
 			->select('users.id','users.name','users.ap_paterno','roles.name as tipo','activo')
 			->get();
+		}else{
+				$listado = DB::table('users')
+				->join('role_user', 'users.id','=','role_user.user_id')
+				->join('roles', 'role_user.role_id','=','roles.id')
+				->where('roles.id', '=' , $id)
+				->where('users.activo', '=' , 'Si')
+				->select('users.id','users.name','users.ap_paterno','roles.name as tipo','activo')
+				->get();
+		}
 		
 		return $listado;
 

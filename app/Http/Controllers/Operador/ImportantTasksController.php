@@ -9,6 +9,7 @@ use App\Http\Requests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 use App\Requerimiento;
 use App\Rquerimiento;
@@ -23,6 +24,7 @@ use App\SolucionRq;
 use App\Instalacion;
 use App\CertOnLine;
 use App\FechaReq;
+use App\Tiempo;
 
 use File;
 
@@ -562,13 +564,24 @@ class ImportantTasksController extends Controller
 
 	public function adjuntoArchivos($id, $etapa){
 
-		$adjuntos = DB::table('tb_adjuntos')
+		if($etapa == 1000){
+			$adjuntos = DB::table('tb_adjuntos')
+			->where('id_requerimiento', '=' , $id)
+			->select('id_adjunto', 'id_requerimiento', 
+					 'id_etapa', 'nombre', 
+					 'fecha', 'hora')
+			->orderBy('id_adjunto', 'ASC')
+			->get();
+			
+		}else{
+			$adjuntos = DB::table('tb_adjuntos')
 			->where('id_requerimiento', '=' , $id)
 			->where('id_etapa', '=' , $etapa)
 			->select('id_adjunto', 'id_requerimiento', 
 					 'id_etapa', 'nombre', 
 					 'fecha', 'hora')
 			->get();
+		}
 
 		return $adjuntos;
 	}
@@ -1692,6 +1705,12 @@ class ImportantTasksController extends Controller
 
     public function nuevoRequerimiento(){
 
+    	if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$user = \Auth::user();
+ 		
     	date_default_timezone_set('America/La_Paz');
 	    
 	//    $this->validate($request, AsigInstalReq::$rules, AsigInstalReq::$messages);
@@ -1752,6 +1771,7 @@ class ImportantTasksController extends Controller
 		$operador = DB::table('users')
 			->join('role_user', 'users.id','=','role_user.user_id')
 			->join('roles', 'role_user.role_id','=','roles.id')
+			->where('users.id', '=' , $user->id)
 			->where('roles.id', '=' , '5')
 			->where('users.activo', '=' , 'Si')
 			->select('users.id','users.name','users.ap_paterno','roles.name as tipo','activo')
@@ -1845,6 +1865,516 @@ class ImportantTasksController extends Controller
 
     }
 
+    /***Certificaciones****/
 
+	public function reqListarCertificaciones(Request $request){
+       
+        $req_id = 0;
+        if(!empty($_GET)){
+	        foreach ($_GET as $key => $value) {
+	        	 $req_id = base64_decode($key);
+	        	// base64_decode
+	        }
+	    }
+        
+		$user = \Auth::user();
+
+		if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$rqAsig = DB::select('SELECT a.Nro_asignacion,
+		    a.id_requerimiento,a.id_gestor,a.id_programador,a.fecha_asignacion,a.hora_asignacion,
+		    a.accesible as accesible_asig,ap.nro_aprobacion,ap.fecha_aprobacion,ap.hora_aprobacion, 
+		    rq.prioridad, rq.tipo, rq.fecha_solicitud, rq.hora_solicitud, rq.accesible,
+		    rq.descripcion, rq.resultado,
+		    (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= a.id_gestor ) asig_por,
+		    (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= a.id_programador ) asig_a,
+            (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= rq.id_operador ) solicitado_por, sl.id_solucion, sl.id_asignacion, sl.secuencia, sl.fecha_inicio, sl.hora_inicio, sl.fecha_fin, sl.hora_fin, sl.descripcion,sl.accesible
+		    FROM tb_asignacion_requerimiento a 
+		    JOIN tb_aprobacion_requerimiento ap ON a.id_requerimiento=ap.id_requerimiento
+            JOIN tb_solucion_requerimiento sl on ap.id_requerimiento=sl.id_solucion
+		    JOIN tb_requerimiento rq ON a.id_requerimiento=rq.id_requerimiento 
+		    WHERE sl.accesible="Si" AND rq.id_operador = :id' , ['id' => $user->id]);
+
+		$pagTitulo = 'Certificaciones Pre-Instalación';
+
+		/*listdo de rq en desarrollo*/
+		$rqDesarrollo = DB:: select("SELECT  req.Nro_asignacion, req.id_requerimiento, req.accesible, req.nro_aprobacion,  req.prioridad , t.fase , req.id_solucion
+			FROM ( 
+			    SELECT  a.Nro_asignacion, a.id_requerimiento, sl.accesible, ap.nro_aprobacion, rq.prioridad, sl.id_solucion
+			    FROM tb_asignacion_requerimiento a 
+			    JOIN tb_aprobacion_requerimiento ap ON a.id_requerimiento=ap.id_requerimiento
+			    JOIN tb_solucion_requerimiento sl on ap.id_requerimiento=sl.id_solucion 
+			    JOIN tb_requerimiento rq ON a.id_requerimiento=rq.id_requerimiento 
+			    WHERE sl.accesible='Si' AND rq.id_operador = :id1
+			    GROUP BY a.Nro_asignacion, a.id_requerimiento, a.accesible, ap.nro_aprobacion, rq.prioridad,sl.id_solucion  ) req 
+			    JOIN tb_tiempos t ON (req.id_requerimiento = t.id_requerimiento and t.fase = 'certipru')
+			    GROUP BY req.Nro_asignacion, req.id_requerimiento, req.accesible, req.nro_aprobacion,req.prioridad, req.id_solucion ", ['id1' => $user->id]);
+
+		/*listdo de rq en pruebas*/
+		$rqPrueba = DB::select("
+			SELECT *, rq.id_requerimiento, rq.prioridad FROM tb_certificacion 
+			JOIN tb_requerimiento rq ON  tb_certificacion.id_certificacion = rq.id_requerimiento
+			WHERE tb_certificacion.accesible='Si' AND tb_certificacion.id_operador = :id1
+			ORDER BY tb_certificacion.id_certificacion ASC", ['id1' => $user->id]);
+	
+		foreach ($rqAsig as $keya => $valuea){
+
+			$tiempo1 = DB::select('SELECT * FROM tb_tiempos WHERE fase="certipru" AND id_requerimiento = :id', ['id' => $valuea->Nro_asignacion]);
+			
+				if(!$tiempo1){
+					$rqAsignados[]= array('Nro_asignacion' => $valuea->Nro_asignacion,
+							'id_requerimiento' => $valuea->id_requerimiento,
+							'id_gestor' => $valuea->id_gestor,
+							'id_programador' => $valuea->id_programador,
+							'fecha_asignacion' => $valuea->fecha_asignacion, 
+							'hora_asignacion' => $valuea->hora_asignacion,
+							'accesible' => $valuea->accesible,
+							'nro_aprobacion' => $valuea->nro_aprobacion,
+							'fecha_aprobacion' => $valuea->fecha_aprobacion,
+							'hora_aprobacion' => $valuea->hora_aprobacion,
+							'prioridad' => $valuea->prioridad
+							);
+				}
+	    	}
+
+		$activo = array(
+			'aprobado' => array('active' => '' , 'show_active' => '' ),
+			'asignado' => array('active' => 'active' , 'show_active' => 'show active' ),  
+			'desarrollo' => array('active' => '' , 'show_active' => '' ),
+			'pruebas' => array('active' => '' , 'show_active' => '' ),
+			'instalacion' => array('active' => '' , 'show_active' => '' ),
+			'certificado' => array('active' => '' , 'show_active' => '' )
+		);
+
+		$arraycodFase = array(  'id_fase1' => 1, 
+								'id_fase2' => 2,
+								'id_fase3' => 3,
+								'id_fase4' => 4,
+								'id_fase5' => 5,
+								'id_fase6' => 6,
+								'id_fase7' => 7,
+								'id_fase8' => 8,
+								'id_fase9' => 9,
+								'id_fase10' => 10 );
+
+		$arrayTiempoFin = array();
+
+		foreach ($rqAsig as $keyt => $valuet){
+
+			$tiempo = DB::select('SELECT * FROM tb_tiempos WHERE fase="certipru" and id_requerimiento = :id', ['id' => $valuet->id_requerimiento]);
+			
+			if($tiempo){
+				foreach ($tiempo as $keytt => $valuett){
+					if($tiempo[$keytt]->fase == 'desarrollo' and $tiempo[$keytt]->estado == 'I'){
+			    		$arrayTiempoFin[] =  array(
+			    									'id_tp'=> $tiempo[$keytt]->id_tiempo,
+			    									'id_rq'=> $tiempo[$keytt]->id_requerimiento
+			    									);
+		    		}	
+				}
+	    	}
+		}
+
+		$arrayAdjunto = array();
+		$arrayAdj = array();
+		$arrayAdjuntos = array();
+		$arrayAdjTodos = array();
+
+		foreach ($rqAsig as $keyad => $valuead){
+			$arrayAdj = array();
+			$adjTodos = array();
+
+			$adjuntos = DB::table('tb_adjuntos')
+			->where('id_requerimiento', '=' , $valuead->id_requerimiento)
+			//->where('id_requerimiento', '=' , 3784)
+			->where('id_etapa', '=' , 5)
+			//->where('id_etapa', '=' , '1')
+			->select('id_adjunto', 'id_requerimiento', 
+					 'id_etapa', 'nombre', 
+					 'fecha', 'hora')
+			->get();
+
+			if($adjuntos->isEmpty()){
+				$adjVacio = array(
+									'id_adjunto' => 0,
+									'id_requerimiento' => $valuead->id_requerimiento,
+									'id_etapa' => 5,
+									'nombre' => '',
+									'fecha' => '',
+									'hora' => ''
+								 );
+				$arrayAdj[$valuead->id_requerimiento] = $adjVacio;
+
+			}else{
+				$arrayAdj[$valuead->id_requerimiento] = $adjuntos;
+	
+			}
+
+			$adjTodos[$valuead->id_requerimiento] = $this->adjuntoArchivos($valuead->id_requerimiento,1000);
+
+			array_push($arrayAdjTodos, $adjTodos);
+			array_push($arrayAdjunto, $arrayAdj);
+		}
+
+		$nombreFuncion = 'reqListarCert';
+
+		$rqAsignadosHisto = array();
+		$arrayAdjuntos = json_decode(json_encode($arrayAdjunto));
+		$rqAsignados = json_decode(json_encode($rqAsignados));
+		$arrayAdjTodos = json_decode(json_encode($arrayAdjTodos));
+	
+		return view('operador.rq_certi')->with(compact('rqAsignados','rqAsignadosHisto','pagTitulo','activo','arraycodFase','arrayTiempoFin','rqDesarrollo','rqAsig','rqPrueba','arrayAdjuntos','nombreFuncion','req_id','arrayAdjTodos'));
+	}
+
+	public function revGuadarReqAsig(Request $request)
+	{
+		return response()->json([
+			    'success'   => true,
+			    'message'   => 'Los datos se han guardado correctamente.' 
+			    ], 200);
+
+ 		return response()->json([
+            'exception' => false,
+            'success'   => false,
+            'message'   => $errors 
+        ], 422);
+	}
+
+	public function revAsigTiempoReq(Request $request)
+	{    
+		date_default_timezone_set('America/La_Paz');
+		$ulitmoTiempo = $request->tiempo_id;
+		$hora_calculada = '00:00:00';
+
+		if($request->accion == 'insert'){
+		
+			$last = DB::table('tb_tiempos')->orderBy('id_tiempo','DESC')->first();
+			$ulitmoTiempo = $last->id_tiempo + 1;
+
+			$fecha = date('Y')."-".date('m')."-".date('d');
+			$hora = date('H').":".date('i').":".date('s');
+			
+			$tiempo = new Tiempo();
+			$tiempo->id_tiempo = $ulitmoTiempo;
+			$tiempo->id_requerimiento = $request->name;
+			$tiempo->fecha_ini = $fecha;
+			$tiempo->hora_ini = $hora;
+			$tiempo->fase = 'certipru';
+			$tiempo->estado = 'I';
+
+			if (!$tiempo->save()){
+			 		return response()->json([
+			            'exception' => false,
+			            'success'   => false,
+			            'message'   => 'No se pudo cargar los datos, intente nuevamente por favor!' //Se recibe en la sección "error" de tu código JavaScript, y se almacena en la variable "info"
+			        ], 422);
+			}else{
+					//
+			}
+		}
+
+		if($request->accion == 'update'){
+			
+			$fecha = date('Y')."-".date('m')."-".date('d');
+			$hora = date('H').":".date('i').":".date('s');
+			
+			$tiempoU = Tiempo::find($request->tiempo_id);
+			$tiempoU->fecha_fin = $fecha;
+			$tiempoU->hora_fin = $hora;
+			$tiempoU->estado = 'F';
+			
+			if (!$tiempoU->save()){
+			 		return response()->json([
+			            'exception' => false,
+			            'success'   => false,
+			            'message'   => 'No se pudo cargar los datos, intente nuevamente por favor!' //Se recibe en la sección "error" de tu código JavaScript, y se almacena en la variable "info"
+			        ], 422);
+			}
+		}
+
+		if($request->accion == 'updateI'){
+			
+			$fecha = date('Y')."-".date('m')."-".date('d');
+			$hora = date('H').":".date('i').":".date('s');
+			$ulitmoTiempo=0;
+			$tiempoU = Tiempo::find($request->tiempo_id);
+			$tiempoU->fecha_fin = $fecha;
+			$tiempoU->hora_fin = $hora;
+			$tiempoU->estado = 'F';
+			
+			if (!$tiempoU->save()){
+			 		return response()->json([
+			            'exception' => false,
+			            'success'   => false,
+			            'message'   => 'No se pudo cargar los datos, intente nuevamente por favor!' //Se recibe en la sección "error" de tu código JavaScript, y se almacena en la variable "info"
+			        ], 422);
+			}
+
+		}
+
+	$rqTiempo = DB::table('tb_tiempos')
+		->where('id_requerimiento', '=' , $request->name)
+		->where('fase', '=' , 'certipru')
+		->where('estado', '=' , 'F')
+		->select('id_tiempo', 'id_requerimiento', 
+				 'fecha_ini', 'hora_ini',
+				 'fecha_fin', 'hora_fin', 
+				 'fase', 'estado')
+		->get();
+
+	if(!$rqTiempo->isEmpty()){
+		$hora_calculada = $this->calculoTiempo($rqTiempo);
+	}else{
+			if($request->tiempo_id != 0){
+				$tiempoU = Tiempo::find($request->tiempo_id);
+				if($tiempoU->estado == 'I' ){
+					$ulitmoTiempo = $request->tiempo_id;
+				}
+			}
+		 }
+
+		return response()->json([
+		    'success'   => true,
+		    'hora_calculada' => $hora_calculada,
+		    'tiempo_id' => $ulitmoTiempo,
+		    'message'   => 'Los datos se han guardado correctamente.' //Se recibe en la seccion "success", data.message
+		    ], 200);
+
+		return response()->json([
+		    'exception' => false,
+		    'success'   => false,
+		    'message'   => $errors //Se recibe en la sección "error" de tu código JavaScript, y se almacena en la variable "info"
+			], 422);
+	}
+
+	public function calculoTiempo($arrayTiempo){
+		
+		date_default_timezone_set('America/La_Paz');
+		
+		foreach ($arrayTiempo as $key => $value) {
+			
+			$horaini = explode(":", $value->hora_ini);
+			$horafin = explode(":", $value->hora_fin);
+			$fechaini = explode("-", $value->fecha_ini);
+			$fechafin = explode("-", $value->fecha_fin);
+
+			$reqTiempo [] = array(   'hora_ini_0'=>$horaini[0],
+									 'hora_ini_1'=>$horaini[1],
+									 'hora_ini_2'=>$horaini[2],
+
+									 'hora_fin_0'=>$horafin[0],
+									 'hora_fin_1'=>$horafin[1],
+									 'hora_fin_2'=>$horafin[2],
+									 
+									 'fecha_ini_0'=>$fechaini[0],
+									 'fecha_ini_1'=>$fechaini[1],
+									 'fecha_ini_2'=>$fechaini[2],
+									 
+									 'fecha_fin_0'=>$fechafin[0],
+									 'fecha_fin_1'=>$fechafin[1],
+									 'fecha_fin_2'=>$fechafin[2]
+							  	  );
+	
+		}
+
+		foreach ($reqTiempo as $key1 => $value1) {
+			// mktime(horas, minutos, segundo, Mes,dia, Año);
+			$timesIni = mktime($value1['hora_ini_0'],$value1['hora_ini_1'],$value1['hora_ini_2'],  $value1['fecha_ini_1'], $value1['fecha_ini_2'], $value1['fecha_ini_0']);
+			$timesFin = mktime($value1['hora_fin_0'],$value1['hora_fin_1'],$value1['hora_fin_2'],  $value1['fecha_fin_1'],$value1['fecha_fin_2'],$value1['fecha_fin_0']);
+			
+	    	$calculoTime[] = abs($timesFin - $timesIni);
+			
+		}
+	
+		$horas = array();
+		$hora_calculada = array();
+		$suma_h = array();
+		
+		foreach($calculoTime as $key => $segs){
+			$convertir_smh =  $this->convertir_seg_min_horas($segs);
+			$suma_h = $this->suma_horas($convertir_smh,$suma_h);
+		}
+
+		return $suma_h;
+	}
+
+	
+	public function revValidarRq(Request $request){
+
+		$rqTiempo = DB::table('tb_tiempos')
+			->where('id_requerimiento', '=' , $request->name)
+			->where('fase', '=' , 'certipru')
+			->select('id_tiempo', 'id_requerimiento', 
+					 'fecha_ini', 'hora_ini',
+					 'fecha_fin', 'hora_fin', 
+					 'fase', 'estado')
+			->get();
+
+		$adjuntos = DB::table('tb_adjuntos')
+			->where('id_requerimiento', '=' , $request->name)
+			->where('id_etapa', '=' , '5')
+			->select('id_adjunto', 'id_requerimiento', 
+					 'id_etapa', 'nombre', 
+					 'fecha', 'hora')
+			->get();
+
+		if($adjuntos->isEmpty()){
+			return response()->json([
+			            'exception' => false,
+			            'success'   => false,
+			            'message'   =>'Error: Por favor suba la ducumentacion del requerimiento!' 
+			        ], 420);
+		}
+	
+		if(!$rqTiempo->isEmpty()){
+			foreach ($rqTiempo as $key => $value) {
+			 	
+			 	if($value->estado =='I'){
+			 		return response()->json([
+			            'exception' => false,
+			            'success'   => false,
+			            'message'   =>'Error: La tarea esta en ejecución para terminar presione el boton DETENER TAREA!' 
+			        ], 422);
+			 	}
+			
+			}
+			return response()->json([
+			    'success'   => true,
+			    'message'   => 'El requerimiento .' //Se recibe en la seccion "success", data.message
+			    ], 200);
+
+		}else{
+			    return response()->json([
+			            'exception' => false,
+			            'success'   => false,
+			            'message'   =>'Error: Requerimiento no tiene horas trabajadas!' 
+			        ], 421);
+			 }
+	}
+
+
+	 public function revSolucionTarea(Request $request){
+
+	 	if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$user = \Auth::user();
+/*
+ 		$rqTiempo = DB::table('tb_tiempos')
+			->where('id_requerimiento', '=' , $request->idRq)
+			->where('fase', '=' , 'certipru')
+			->select('id_tiempo', 'id_requerimiento', 
+					 'fecha_ini', 'hora_ini',
+					 'fecha_fin', 'hora_fin', 
+					 'fase', 'estado')
+			->orderBy('id_tiempo','ASC')
+			->get();*/
+
+		$certificacionRq = new CertificacionRq();
+ 		$fecha = date('Y')."-".date('m')."-".date('d');
+		$hora = date('H').":".date('i').":".date('s');
+		
+		$certificacionRq->id_certificacion = $request->idRq;
+		$certificacionRq->id_solucion = $request->idRq;
+		$certificacionRq->id_operador = $user->id;
+		/*$certificacionRq->fecha_inicio = $rqTiempo[0]->fecha_ini;
+		$certificacionRq->hora_inicio = $rqTiempo[0]->hora_ini;*/
+		$certificacionRq->fecha_certificacion = $fecha;
+		$certificacionRq->hora_certificacion = $hora;
+
+		$certificacionRq->detalle_certificacion = $request->texto_desc; 
+		$certificacionRq->detalle_funcionalidades = $request->texto_2;
+	
+		$certificacionRq->accesible = 'Si';
+		
+		if($certificacionRq->save()){ 
+			$rqSolucion = SolucionRq::find($request->idRq);
+			$rqSolucion->accesible = 'No';
+			$rqSolucion->save();
+			
+			return response()->json([
+			    'success'   => true,
+			    'message'   => 'El requerimiento ya se encuentra en la siguiente fase.' //Se recibe en la seccion "success", data.message
+			    ], 200);
+
+		}else{
+			    return response()->json([
+			            'exception' => false,
+			            'success'   => false,
+			            'message'   =>'Error: Requerimiento no tiene horas trabajadas!' 
+			        ], 421);
+			 }
+    }
+
+
+    private function suma_horas($hrs1,$hrs2){
+
+    	$hora1=explode(":",$hrs1);
+
+    	if(!empty($hrs2)){
+    		$hora2=explode(":",$hrs2);
+			$calculo_hms = $this->sumar_hra_min_seg($hora1[2],$hora1[1],$hora1[0],$hora2[2],$hora2[1],$hora2[0]); 
+	    }else{
+  			$calculo_hms = $this->sumar_hra_min_seg($hora1[2],$hora1[1],$hora1[0],0,0,0); 
+	    }
+
+	    return $calculo_hms;
+
+	}
+
+	public function contador_seg_min($seg_min,$temp){
+	    
+	    while($seg_min>=60){
+	        $seg_min=$seg_min-60;
+	        $temp++;
+	    }
+	    $hms = array('temp' => $temp, 'seg_min'=> $seg_min);
+	    return $hms;
+	
+	}
+
+	public function sumar_hra_min_seg($seg1,$min1,$hrs1,$seg2,$min2,$hrs2){
+
+		$temp=0;
+		$hms = array();
+		$hms['temp']=0;
+		$segundos=(int)$seg1+(int)$seg2;
+		$hms= $this->contador_seg_min($segundos,$hms['temp']);
+		$segundos =$hms['seg_min'];
+		//sumo minutos 
+		$minutos=(int)$min1+(int)$min2+$hms['temp'];
+		$temp=0;
+		$hms['temp']=0;
+		$hms= $this->contador_seg_min($minutos,$hms['temp']);
+		$minutos =$hms['seg_min'];
+		//sumo horas 
+		$horas=(int)$hrs1+(int)$hrs2+$hms['temp'];
+
+		if($horas<10)
+			$horas= '0'.$horas;
+
+		if($minutos<10)
+			$minutos= '0'.$minutos;
+
+		if($segundos<10)
+			$segundos= '0'.$segundos;
+
+		$sumar_hms = $horas.':'.$minutos.':'.$segundos;
+
+		return $sumar_hms;
+
+	}
+
+	public function convertir_seg_min_horas($seds) {
+
+		$horas = floor($seds / 3600);
+		$minutos = floor(($seds - ($horas * 3600)) / 60);
+		$segundos = $seds - ($horas * 3600) - ($minutos * 60);
+		
+		return $horas . ':' . $minutos . ":" . $segundos;
+	}
 
 }
