@@ -64,8 +64,8 @@ es: "Elegir"
       @endif
 
   <!-- Page Heading -->
-  <h1 class="h3 mb-2 text-gray-800">Requerimentos Pendientes</h1>
-  <p class="mb-4">Detalle del requerimiento. </p>
+  <h1 class="h3 mb-2 text-gray-800">Asignación de Requerimiento a Solucionar</h1>
+  <p class="mb-4">Detalle del Requerimiento a Solucionar. </p>
 
   <!-- DataTales Example -->
   <div class="card shadow mb-4">

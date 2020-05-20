@@ -406,7 +406,7 @@ function drop(ev) {
 	    type:"POST",
 	    url:"{{route('guadarReqAsig')}}",
 	    data:{'name': data1},
-	 //  data: $("#drag_{{ $value->id_requerimiento }}").serialize(),
+
 	    dataType : 'html',
 	    success: function(data){
 	    	//render(selectedEvent, data);
@@ -448,16 +448,17 @@ function drop(ev) {
 	var inicio=0;
 	var timeout=0;
 	var horas_cal = 0;
-    var minutos_cal = 0;
-    var segundos_cal = 0;
-    var horas_inicial = 0;
-    var anioo = 0;
+  var minutzzos_cal = 0;
+  var segundos_cal = 0;
+  var horas_inicial = 0;
+  var anioo = 0;
 	var mess = 0;
 	var diaa = 0;
 	var id_rq = 0;
 	var tiempo_i = 0;
 	var timeout1 = 0;
 	var id_reqq = 0;
+  var nom_fase = 'no_fase';
 
  
 	function iniciarFinalizar(elemento,idReq)
@@ -606,8 +607,8 @@ function showDiv(obj,mostrar, code){
 function mostrarDetalle(idReq,accion,tiempo_i){
 	
 	var tiempoId=0;
-	
-	if(accion=='ver'){
+		
+  if(accion=='ver'){
 		tiempoId=document.getElementById('tiempo_i_'+idReq).value;	
 	}
 	if(accion=='update'){
@@ -620,7 +621,7 @@ function mostrarDetalle(idReq,accion,tiempo_i){
 	$.ajax({
 		    type:"POST",
 		    url:"{{route('revAsigMostrarDet')}}",
-		    data:{'name': idReq,'accion':accion,'tiempo_id':tiempoId},
+		    data:{'name': idReq,'accion':accion,'tiempo_id':tiempoId,'nom_fase':'no_fase'},
 	        dataType : 'html',
 		    success: function(data){
 		    	var para_hora = JSON.parse(data);

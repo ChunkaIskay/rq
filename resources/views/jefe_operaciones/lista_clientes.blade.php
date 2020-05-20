@@ -52,7 +52,6 @@
                             @if($value->activo == 'No' )
                              Inactivo
                             @endif
-
                         </td>
                         <td class="td-actions text-right">
                                 <a href="{{ url('/JefeOperaciones/'.$value->id_cliente.'/modificar-cliente') }}" type="button" rel="tooltip" title="Modificar cliente" class="btn btn-info btn-simple btn-xs">

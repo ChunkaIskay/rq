@@ -25,12 +25,13 @@ use App\Instalacion;
 use App\CertOnLine;
 use App\FechaReq;
 use App\Tiempo;
-
+use App\Traits\RechazarFase;
 use File;
 
 class ImportantTasksController extends Controller
 {
-    
+    use RechazarFase;
+
 	public function rqDetalleAprob($id){
 
 		$detalle = DB::table('tb_requerimiento')
@@ -90,7 +91,7 @@ class ImportantTasksController extends Controller
 
     	$adjunto = DB::table('tb_adjuntos')
 		->where('id_adjunto', '=' , $id)
-		->where('id_etapa', '=' , '1')
+		//->where('id_etapa', '=' , '1')
 		->select('id_adjunto', 'id_requerimiento', 
 				 'id_etapa', 'nombre')
 		->get();
@@ -1572,25 +1573,14 @@ class ImportantTasksController extends Controller
    		$rqexaminar = DB::select('SELECT DISTINCT tb_requerimiento.id_requerimiento, tb_requerimiento.tipo, tb_requerimiento.tipo_tarea, tb_requerimiento.fecha_solicitud, tb_requerimiento.hora_solicitud, tb_requerimiento.prioridad, tb_requerimiento.accesible FROM tb_requerimiento 
    			JOIN tb_cliente ON tb_requerimiento.id_cliente=tb_cliente.id_cliente 
    			JOIN users ON tb_requerimiento.id_operador=users.id 
-            ORDER BY tb_requerimiento.id_requerimiento ASC');
+            ORDER BY tb_requerimiento.id_requerimiento DESC');
 
    		$pagTitulo = "Examinar requerimiento";
    		$pag = "examinar";
 
 		return view('operador.rq_examinar_listado')->with(compact('rqexaminar','pagTitulo','pag'));
 
-	//dd($pendInstalar);
-	//$pendInstalar = Paginator::make($pendInstalar, count($pendInstalar), $results_per_page);
-	//$perPage=20;
-    	
-    //    $currentPage = 0;
-    //	$pagedData = array_slice($pendInstalar, $currentPage * $perPage, $perPage);
-    //	$pendInstalar = new \Illuminate\Pagination\LengthAwarePaginator($pagedData, count($pendInstalar), $perPage);
-
-    	//$pendInstalar = collect($pendInstalar1)->get();
-
-    //	return view('operador.rq_pendientes_instalar')->with(compact('pendInstalar'));
-
+	
     }
 
     public function urlAntes($path,$bsearch){
@@ -1826,11 +1816,15 @@ class ImportantTasksController extends Controller
     }
 
     public function deleteFile(Request $request){
-	   
-	  try {
+
+		if($request->id_requerimiento){
+			$request['id'] = $request['id_requerimiento'];
+		}
+
+	  	try {
          
             $adjunto = Adjunto::findOrFail($request['idAdjunto']);
- 			
+
 		    $archivo_path = storage_path("app/files/{$adjunto->nombre}");
 
 		    if (File::exists($archivo_path)) {
@@ -1898,6 +1892,7 @@ class ImportantTasksController extends Controller
 		    WHERE sl.accesible="Si" AND rq.id_operador = :id' , ['id' => $user->id]);
 
 		$pagTitulo = 'Certificaciones Pre-Instalación';
+		$rqAsignados = array();
 
 		/*listdo de rq en desarrollo*/
 		$rqDesarrollo = DB:: select("SELECT  req.Nro_asignacion, req.id_requerimiento, req.accesible, req.nro_aprobacion,  req.prioridad , t.fase , req.id_solucion
@@ -1922,7 +1917,7 @@ class ImportantTasksController extends Controller
 		foreach ($rqAsig as $keya => $valuea){
 
 			$tiempo1 = DB::select('SELECT * FROM tb_tiempos WHERE fase="certipru" AND id_requerimiento = :id', ['id' => $valuea->Nro_asignacion]);
-			
+		
 				if(!$tiempo1){
 					$rqAsignados[]= array('Nro_asignacion' => $valuea->Nro_asignacion,
 							'id_requerimiento' => $valuea->id_requerimiento,
@@ -1937,7 +1932,7 @@ class ImportantTasksController extends Controller
 							'prioridad' => $valuea->prioridad
 							);
 				}
-	    	}
+	    }
 
 		$activo = array(
 			'aprobado' => array('active' => '' , 'show_active' => '' ),
@@ -2043,7 +2038,7 @@ class ImportantTasksController extends Controller
 	}
 
 	public function revAsigTiempoReq(Request $request)
-	{    
+	{   
 		date_default_timezone_set('America/La_Paz');
 		$ulitmoTiempo = $request->tiempo_id;
 		$hora_calculada = '00:00:00';
@@ -2051,7 +2046,7 @@ class ImportantTasksController extends Controller
 		if($request->accion == 'insert'){
 		
 			$last = DB::table('tb_tiempos')->orderBy('id_tiempo','DESC')->first();
-			$ulitmoTiempo = $last->id_tiempo + 1;
+				$ulitmoTiempo = $last->id_tiempo + 1;
 
 			$fecha = date('Y')."-".date('m')."-".date('d');
 			$hora = date('H').":".date('i').":".date('s');
@@ -2061,8 +2056,14 @@ class ImportantTasksController extends Controller
 			$tiempo->id_requerimiento = $request->name;
 			$tiempo->fecha_ini = $fecha;
 			$tiempo->hora_ini = $hora;
-			$tiempo->fase = 'certipru';
+
+			if($request->nom_fase != 'no_fase')
+				$tiempo->fase = $request->nom_fase;
+			else
+				$tiempo->fase = 'certipru';
+
 			$tiempo->estado = 'I';
+
 
 			if (!$tiempo->save()){
 			 		return response()->json([
@@ -2113,7 +2114,7 @@ class ImportantTasksController extends Controller
 			}
 
 		}
-
+/*
 	$rqTiempo = DB::table('tb_tiempos')
 		->where('id_requerimiento', '=' , $request->name)
 		->where('fase', '=' , 'certipru')
@@ -2123,6 +2124,12 @@ class ImportantTasksController extends Controller
 				 'fecha_fin', 'hora_fin', 
 				 'fase', 'estado')
 		->get();
+*/
+		//dd($request);
+	if($request->nom_fase != 'no_fase')
+		$rqTiempo = $this->selectReqTiempo($request->nom_fase, $request->name);
+	else
+		$rqTiempo = $this->selectReqTiempo('certipru',$request->name);
 
 	if(!$rqTiempo->isEmpty()){
 		$hora_calculada = $this->calculoTiempo($rqTiempo);
@@ -2376,5 +2383,628 @@ class ImportantTasksController extends Controller
 		
 		return $horas . ':' . $minutos . ":" . $segundos;
 	}
+
+	/**
+		Certificación online!
+	**/
+
+	public function revListarCertOnline(){
+
+    	if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$user = \Auth::user();
+		
+		$rqAsigIstalar = DB::select("
+		
+		SELECT i.id_instalacion, i.id_asig_instal,
+				(SELECT CONCAT(name,' ',ap_paterno) FROM users WHERE id=inst_req.id_gestor ) nom_gestor , 
+				(SELECT CONCAT(name,' ',ap_paterno) FROM users WHERE id=inst_req.id_programador ) nom_prog , 
+				i.fecha_instal, i.hora_instal, i.accesible 
+		FROM tb_instalacion i 
+		JOIN tb_asignacion_instal_req inst_req on i.id_instalacion = inst_req.id_asig_instal 
+		join tb_usuario on inst_req.id_programador=tb_usuario.id_usuario
+		JOIN tb_requerimiento r on inst_req.id_asig_instal = r.id_requerimiento 
+		JOIN tb_asignacion_requerimiento A on R.id_requerimiento=A.id_requerimiento 
+		JOIN tb_solucion_requerimiento S on A.Nro_asignacion=S.id_asignacion 
+		WHERE i.accesible='Si' AND r.id_operador =:idi
+		ORDER BY inst_req.id_asig_instal ASC ", ['idi' => $user->id]);
+
+
+		return view('operador.rq_list_cert_online')->with(compact('rqAsigIstalar'));
+
+    }
+
+	public function asigInstalar(){   
+
+    	$listAprob = DB::table('tb_aprobacion_requerimiento')
+		->where('accesible', '=' , 'Si')
+		->select('nro_aprobacion','id_requerimiento','fecha_aprobacion','hora_aprobacion','accesible')
+		->orderBy('id_requerimiento','ASC')
+		->get();
+
+		    	
+		return view('Operador.rq_asignar_instalar')->with(compact('listAprob'));    
+	}
+
+	public function revDetalleCertOnline(Request $request,$id){
+
+		$req_id = 0;
+        if(!empty($_GET)){
+	        foreach ($_GET as $key => $value) {
+	        	 $req_id = base64_decode($key);
+	        	// base64_decode
+	        }
+	    }
+        
+		$user = \Auth::user();
+
+		if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+	
+		$rqAsignados = array();
+		$nombre_fase = 'certonline';
+
+		$tiempo_vacio = 0;
+
+		$rqAsig = DB::select('SELECT i.id_instalacion, i.id_asig_instal, i.fecha_instal, i.hora_instal, a.Nro_asignacion,
+		    a.id_requerimiento,a.id_gestor,a.id_programador,a.fecha_asignacion,a.hora_asignacion,
+		    a.accesible as accesible_asig,ap.nro_aprobacion,ap.fecha_aprobacion,ap.hora_aprobacion, 
+		    rq.prioridad, rq.tipo, rq.fecha_solicitud, rq.hora_solicitud, rq.accesible,
+		    rq.descripcion, rq.resultado,
+		    (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= ai.id_gestor ) asig_por,
+		    (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= ai.id_programador ) asig_a,
+            (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= rq.id_operador ) solicitado_por,
+            (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= ce.id_operador ) certificado_por,
+            (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= ai.id_programador ) instal_por,
+            s.fecha_inicio, s.hora_inicio, s.fecha_fin, s.hora_fin, s.secuencia, ce.id_certificacion, ce.fecha_certificacion, ce.hora_certificacion, ce.detalle_certificacion, ce.detalle_funcionalidades
+		    FROM tb_instalacion i
+		    JOIN tb_asignacion_requerimiento a ON i.id_instalacion = a.id_requerimiento
+		    JOIN tb_aprobacion_requerimiento ap ON a.id_requerimiento=ap.id_requerimiento
+		    JOIN tb_requerimiento rq ON a.id_requerimiento=rq.id_requerimiento
+            JOIN tb_solucion_requerimiento s on a.Nro_asignacion=s.id_solucion 
+            JOIN tb_asignacion_instal_req ai on s.id_solucion=ai.id_solucion
+            JOIN tb_certificacion ce ON s.id_solucion = ce.id_solucion
+            WHERE i.accesible="Si" AND i.id_instalacion=:id 
+            ORDER BY i.fecha_instal ASC', ['id' => $id]);
+
+	//	dd($rqAsig);
+
+		$pagTitulo = 'Detalle del requerimiento Certicaión Online';
+
+		/*listdo de rq en desarrollo*/
+		$rqDesarrollo = DB:: select("SELECT  req.Nro_asignacion, req.id_requerimiento, req.accesible, req.nro_aprobacion,  req.prioridad , t.fase 
+			FROM ( 
+			    SELECT  a.Nro_asignacion, a.id_requerimiento, a.accesible, ap.nro_aprobacion, rq.prioridad 
+			    FROM tb_asignacion_requerimiento a 
+			    JOIN tb_aprobacion_requerimiento ap ON a.id_requerimiento=ap.id_requerimiento 
+			    JOIN tb_requerimiento rq ON a.id_requerimiento=rq.id_requerimiento 
+			    WHERE a.accesible='Si' AND a.id_programador = :id1
+			    GROUP BY a.Nro_asignacion, a.id_requerimiento, ap.nro_aprobacion, rq.prioridad  ) req 
+			    JOIN tb_tiempos t ON (req.Nro_asignacion = t.id_requerimiento and t.fase = 'desarrollo')
+			    GROUP BY req.Nro_asignacion, req.id_requerimiento, req.nro_aprobacion,req.prioridad ", ['id1' => $user->id]);
+
+		/*listdo de rq en pruebas*/
+		$rqPrueba = DB::select("
+			SELECT * FROM tb_solucion_requerimiento 
+			JOIN tb_asignacion_requerimiento a ON tb_solucion_requerimiento.id_asignacion=a.Nro_asignacion 
+			JOIN tb_requerimiento ON a.id_requerimiento=tb_requerimiento.id_requerimiento 
+			WHERE tb_solucion_requerimiento.accesible='Si' AND a.id_programador = :id1
+			ORDER BY tb_requerimiento.id_requerimiento ASC", ['id1' => $user->id]);
+		
+		foreach ($rqAsig as $keya => $valuea){
+
+			$tiempo1 = DB::select('SELECT * FROM tb_tiempos WHERE id_requerimiento = :id', ['id' => $valuea->Nro_asignacion]);
+			
+				if(!$tiempo1){
+					$rqAsignados[]= array('Nro_asignacion' => $valuea->Nro_asignacion,
+							'id_requerimiento' => $valuea->id_requerimiento,
+							'id_gestor' => $valuea->id_gestor,
+							'id_programador' => $valuea->id_programador,
+							'fecha_asignacion' => $valuea->fecha_asignacion, 
+							'hora_asignacion' => $valuea->hora_asignacion,
+							'accesible' => $valuea->accesible,
+							'nro_aprobacion' => $valuea->nro_aprobacion,
+							'fecha_aprobacion' => $valuea->fecha_aprobacion,
+							'hora_aprobacion' => $valuea->hora_aprobacion,
+							'prioridad' => $valuea->prioridad
+							);
+				}
+	    }
+
+		$activo = array(
+			'aprobado' => array('active' => '' , 'show_active' => '' ),
+			'asignado' => array('active' => 'active' , 'show_active' => 'show active' ),  
+			'desarrollo' => array('active' => '' , 'show_active' => '' ),
+			'pruebas' => array('active' => '' , 'show_active' => '' ),
+			'instalacion' => array('active' => '' , 'show_active' => '' ),
+			'certificado' => array('active' => '' , 'show_active' => '' )
+		);
+
+		$arraycodFase = array(  'id_fase1' => 1, 
+								'id_fase2' => 2,
+								'id_fase3' => 3,
+								'id_fase4' => 4,
+								'id_fase5' => 5,
+								'id_fase6' => 6,
+								'id_fase7' => 7,
+								'id_fase8' => 8,
+								'id_fase9' => 9,
+								'id_fase10' => 10);
+
+		$arrayTiempoFin = array();
+		
+		foreach ($rqAsig as $keyt => $valuet){
+
+			$tiempo = DB::select('SELECT * FROM tb_tiempos WHERE fase=:f AND id_requerimiento = :id', ['id' => $valuet->id_requerimiento, 'f'=>$nombre_fase]);
+		
+			if($tiempo){
+				foreach ($tiempo as $keytt => $valuett){
+					if($tiempo[$keytt]->fase == $nombre_fase and $tiempo[$keytt]->estado == 'I'){
+			    		$arrayTiempoFin[] =  array(
+			    									'id_tp'=> $tiempo[$keytt]->id_tiempo,
+			    									'id_rq'=> $tiempo[$keytt]->id_requerimiento
+			    									);
+		    		}	
+				}
+	    	}
+		}
+
+		$arrayAdjunto = array();
+		$arrayAdj = array();
+		$arrayAdjuntos = array();
+		$arrayAdjTodos = array();
+
+		foreach ($rqAsig as $keyad => $valuead){
+			$arrayAdj = array();
+			$adjTodos = array();
+
+			$adjuntos = DB::table('tb_adjuntos')
+			->where('id_requerimiento', '=' , $valuead->id_requerimiento)
+			//->where('id_requerimiento', '=' , 3784)
+			->where('id_etapa', '=' , 8)
+			//->where('id_etapa', '=' , '1')
+			->select('id_adjunto', 'id_requerimiento', 
+					 'id_etapa', 'nombre', 
+					 'fecha', 'hora')
+			->get();
+
+			if($adjuntos->isEmpty()){
+				$adjVacio = array ( 0 => array(
+									'id_adjunto' => 0,
+									'id_requerimiento' => $valuead->id_requerimiento,
+									'id_etapa' => 8,
+									'nombre' => '',
+									'fecha' => '',
+									'hora' => ''
+								 ));
+				$arrayAdj[$valuead->id_requerimiento] = $adjVacio;
+				$adj_vacio=0;
+
+			}else{ $adj_vacio=1;
+				$arrayAdj[$valuead->id_requerimiento] = $adjuntos;
+	
+			}
+
+			$adjTodos[$valuead->id_requerimiento] = $this->adjuntoArchivos($valuead->id_requerimiento,1000);
+
+			array_push($arrayAdjTodos, $adjTodos);
+			array_push($arrayAdjunto, $arrayAdj);
+		}
+ 
+		$nombreFuncion = 'detalleCertificacionOnLine';
+		
+
+		$rqAsignadosHisto = array();
+		$arrayAdjuntos = json_decode(json_encode($arrayAdjunto));
+		$rqAsignados = json_decode(json_encode($rqAsignados));
+		$arrayAdjTodos = json_decode(json_encode($arrayAdjTodos));
+	
+		return view('operador.rq_det_cert_online')->with(compact('detalle','rqAsignados','rqAsignadosHisto','pagTitulo','activo','arraycodFase','arrayTiempoFin','rqDesarrollo','rqAsig','rqPrueba','arrayAdjuntos','nombreFuncion','req_id','arrayAdjTodos','nombre_fase','adj_vacio'));
+		
+
+	}
+
+	public function revGuadarCertOnline(Request $request, $id){
+				
+	    date_default_timezone_set('America/La_Paz');
+	    $tiempo_out = array();
+		
+		$user = \Auth::user();
+
+		if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		//$this->validate($request, instalacion::$rules, instalacion::$messages);
+	    $tiempo = DB::select('SELECT * FROM tb_tiempos WHERE fase="certonline" AND id_requerimiento = :id 
+	    	ORDER BY id_tiempo DESC', ['id' => $id]);
+	    
+	    $tiempo_out[0] = 0;
+	    $tiempo_out[1] = 0;
+
+	    if($tiempo){
+		  	foreach($tiempo as $key => $value1){
+		    	if($value1->estado == 'I'){
+		    		$tiempo_out[0]= 1;
+		    	}
+		    	if($value1->estado == 'F'){
+		    		$tiempo_out[1] = 1;
+		    	}
+		    }
+        }
+
+        if($tiempo_out[0] == 1){
+        	return redirect()->route('detalleCertificacionOnLine', $id)->with(array(
+			    		'error' => 'Error!. Detenga las tareas de certificación online por favor!.'
+			    		));
+        }
+      // print_r($tiempo);
+	   // dd($request);
+
+        if($tiempo_out[1] == 1){
+			if(!empty($request->textDesc)){
+				// ingresar registros en asignación de requerimientos..
+				$certOnlinerq = new CertOnline();
+
+				$fecha = date('Y-m-d');
+				$hora = date('H:i:s');
+
+			    $certOnlinerq->id_certificacion_online = $request->id_reqqq;
+			    $certOnlinerq->id_instalacion = $request->id_reqqq;
+				$certOnlinerq->id_operador = $user->id;
+			    $certOnlinerq->conformidad = $request->textDesc;
+			    $certOnlinerq->fecha_certificacion = $fecha;
+			    $certOnlinerq->hora_certificacion = $hora;
+				$certOnlinerq->accesible = 'Si';
+			
+		    	if($certOnlinerq->save()){// save
+			        //actualizar el campo accesible de la tabla 
+
+			        $rqInstalacion = Instalacion::find($id);
+			    	$rqInstalacion->accesible = 'No';
+			        $rqInstalacion->save();
+			  		
+			  		return redirect()->route('revCertificacionOnLine')->with(array(
+				    		'message' => 'El requerimiento fue certificado(online)! exitosamente!.'
+				    	));
+				}
+				return redirect()->route('detalleCertificacionOnLine', $id)->with(array(
+			    		'error' => 'Error, vuelva a intentar otra vez!.'
+			    		));
+			}else{
+				return redirect()->route('detalleCertificacionOnLine', $id)->with(array(
+			    		'error' => 'Error, El campo conformidad es obligatorio!.'
+			    		));
+			    }
+		}else{
+			return redirect()->route('detalleCertificacionOnLine', $id)->with(array(
+			    		'error' => 'Error!. Inicie las tareas de certificación Online por favor!.'
+			    		));
+		}
+    	
+	}
+
+	private function selectReqTiempo($req_fase,$id_req){
+		
+		$reqTiempo = DB::table('tb_tiempos')
+		->where('id_requerimiento', '=' , $id_req)
+		->where('estado', '=' , 'F')
+		->where('fase', '=' , $req_fase)
+		->select('id_tiempo', 'id_requerimiento', 
+				 'fecha_ini', 'hora_ini',
+				 'fecha_fin', 'hora_fin', 
+				 'fase', 'estado')
+		->get();
+
+		return $reqTiempo;
+	}
+
+	public function revListarCertSvn(){
+
+    	if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$user = \Auth::user();
+		
+		$rqControVer = DB::select("SELECT * FROM tb_control_svn cv 
+			JOIN tb_certificacion_online co ON cv.id_certificacion_online=co.id_certificacion_online 
+			WHERE cv.accesible='Si' AND co.id_operador= :idi ORDER BY fecha_subversion ASC ", ['idi' => $user->id]);
+
+
+		return view('operador.rq_list_control_svn')->with(compact('rqControVer'));
+
+    }
+
+    public function revDetalleCertSvn(Request $request,$id){
+
+		$req_id = 0;
+        if(!empty($_GET)){
+	        foreach ($_GET as $key => $value) {
+	        	 $req_id = base64_decode($key);
+	        	// base64_decode
+	        }
+	    }
+        
+		$user = \Auth::user();
+
+		if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$detalle = DB::select("
+			SELECT li.*, (SELECT concat(users.name , ' ', users.ap_paterno) as nombre_completo FROM users 
+			WHERE users.id = id_gestor ) asig_por, (SELECT concat(users.name , ' ', users.ap_paterno) as nombre_completo FROM users 
+			WHERE users.id = id_programador ) asig_a   FROM
+			(
+			SELECT 
+			tb_asignacion_instal_req.id_asig_instal, 
+			tb_asignacion_instal_req.id_gestor, 
+			tb_asignacion_instal_req.id_solucion, 
+			tb_asignacion_instal_req.id_programador,
+			tb_asignacion_instal_req.fecha_asig_instal,
+			tb_asignacion_instal_req.hora_asig_instal,
+			tb_solucion_requerimiento.descripcion desc_rq,
+			tb_requerimiento.descripcion desc_solu,
+			tb_requerimiento.id_operador 
+			FROM tb_asignacion_instal_req
+			JOIN tb_solucion_requerimiento ON tb_asignacion_instal_req.id_solucion=tb_solucion_requerimiento.id_solucion
+			JOIN tb_asignacion_requerimiento ON tb_solucion_requerimiento.id_asignacion=tb_asignacion_requerimiento.Nro_asignacion 
+			JOIN tb_requerimiento ON tb_asignacion_requerimiento.id_requerimiento=tb_requerimiento.id_requerimiento 
+			WHERE id_asig_instal = :ida ) as li
+			JOIN users ON li.id_operador = users.id", ['ida' => $id]);
+
+		$rqAsignados = array();
+		$nombre_fase = 'instlinea';
+
+		$tiempo_vacio = 0;
+
+		$rqAsig = DB::select('SELECT i.id_instalacion, i.id_asig_instal, i.fecha_instal, i.hora_instal, a.Nro_asignacion,
+		    a.id_requerimiento,a.id_gestor,a.id_programador,a.fecha_asignacion,a.hora_asignacion,
+		    a.accesible as accesible_asig,ap.nro_aprobacion,ap.fecha_aprobacion,ap.hora_aprobacion, 
+		    rq.prioridad, rq.tipo, rq.fecha_solicitud, rq.hora_solicitud, rq.accesible,
+		    rq.descripcion, rq.resultado,
+		    (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= ai.id_gestor ) asig_por,
+		    (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= ai.id_programador ) asig_a,
+            (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= rq.id_operador ) solicitado_por,
+            (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= ce.id_operador ) certificado_por,
+            (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= ai.id_programador ) instal_por,
+            (SELECT CONCAT(name ," ",ap_paterno) FROM users WHERE id= co.id_operador ) cert_online_por,
+            s.fecha_inicio, s.hora_inicio, s.fecha_fin, s.hora_fin, s.secuencia, ce.id_certificacion, ce.fecha_certificacion, ce.hora_certificacion, ce.detalle_certificacion, ce.detalle_funcionalidades, co.id_certificacion_online, co.fecha_certificacion fecha_certificacion_online, co.hora_certificacion hora_certificacion_online, co.conformidad, co.accesible, 
+            	svn.id_control_svn, svn.id_certificacion_online, svn.fecha_subversion, svn.hora_subversion, svn.fecha_cert, svn.hora_cert, svn.comentarios
+		    FROM 
+            ( 
+            	SELECT id_control_svn, id_certificacion_online, id_operador, fecha_subversion, hora_subversion, fecha_cert, hora_cert, comentarios
+            	FROM tb_control_svn
+            	WHERE id_control_svn =:id ) svn
+
+		    JOIN tb_certificacion_online co on svn.id_control_svn=co.id_certificacion_online
+		    JOIN tb_instalacion i on co.id_instalacion= i.id_instalacion
+		    JOIN tb_asignacion_requerimiento a ON i.id_instalacion = a.id_requerimiento
+		    JOIN tb_aprobacion_requerimiento ap ON a.id_requerimiento=ap.id_requerimiento
+		    JOIN tb_requerimiento rq ON a.id_requerimiento=rq.id_requerimiento
+            JOIN tb_solucion_requerimiento s on a.Nro_asignacion=s.id_solucion 
+            JOIN tb_asignacion_instal_req ai on s.id_solucion=ai.id_solucion
+            JOIN tb_certificacion ce ON s.id_solucion = ce.id_solucion
+            
+            ORDER BY co.fecha_certificacion ASC', ['id' => $id]);
+
+		    //WHERE a.accesible="Si" AND a.id_programador = :id', ['id' => $user->id]);
+
+		$pagTitulo = 'Detalle del requerimiento Control de versiones pendientes';
+
+		/*listdo de rq en desarrollo*/
+		$rqDesarrollo = DB:: select("SELECT  req.Nro_asignacion, req.id_requerimiento, req.accesible, req.nro_aprobacion,  req.prioridad , t.fase 
+			FROM ( 
+			    SELECT  a.Nro_asignacion, a.id_requerimiento, a.accesible, ap.nro_aprobacion, rq.prioridad 
+			    FROM tb_asignacion_requerimiento a 
+			    JOIN tb_aprobacion_requerimiento ap ON a.id_requerimiento=ap.id_requerimiento 
+			    JOIN tb_requerimiento rq ON a.id_requerimiento=rq.id_requerimiento 
+			    WHERE a.accesible='Si' AND a.id_programador = :id1
+			    GROUP BY a.Nro_asignacion, a.id_requerimiento, ap.nro_aprobacion, rq.prioridad  ) req 
+			    JOIN tb_tiempos t ON (req.Nro_asignacion = t.id_requerimiento and t.fase = 'desarrollo')
+			    GROUP BY req.Nro_asignacion, req.id_requerimiento, req.nro_aprobacion,req.prioridad ", ['id1' => $user->id]);
+
+		/*listdo de rq en pruebas*/
+		$rqPrueba = DB::select("
+			SELECT * FROM tb_solucion_requerimiento 
+			JOIN tb_asignacion_requerimiento a ON tb_solucion_requerimiento.id_asignacion=a.Nro_asignacion 
+			JOIN tb_requerimiento ON a.id_requerimiento=tb_requerimiento.id_requerimiento 
+			WHERE tb_solucion_requerimiento.accesible='Si' AND a.id_programador = :id1
+			ORDER BY tb_requerimiento.id_requerimiento ASC", ['id1' => $user->id]);
+		
+		foreach ($rqAsig as $keya => $valuea){
+
+			$tiempo1 = DB::select('SELECT * FROM tb_tiempos WHERE id_requerimiento = :id', ['id' => $valuea->Nro_asignacion]);
+			
+				if(!$tiempo1){
+					$rqAsignados[]= array('Nro_asignacion' => $valuea->Nro_asignacion,
+							'id_requerimiento' => $valuea->id_requerimiento,
+							'id_gestor' => $valuea->id_gestor,
+							'id_programador' => $valuea->id_programador,
+							'fecha_asignacion' => $valuea->fecha_asignacion, 
+							'hora_asignacion' => $valuea->hora_asignacion,
+							'accesible' => $valuea->accesible,
+							'nro_aprobacion' => $valuea->nro_aprobacion,
+							'fecha_aprobacion' => $valuea->fecha_aprobacion,
+							'hora_aprobacion' => $valuea->hora_aprobacion,
+							'prioridad' => $valuea->prioridad
+							);
+				}
+	    }
+
+		$activo = array(
+			'aprobado' => array('active' => '' , 'show_active' => '' ),
+			'asignado' => array('active' => 'active' , 'show_active' => 'show active' ),  
+			'desarrollo' => array('active' => '' , 'show_active' => '' ),
+			'pruebas' => array('active' => '' , 'show_active' => '' ),
+			'instalacion' => array('active' => '' , 'show_active' => '' ),
+			'certificado' => array('active' => '' , 'show_active' => '' )
+		);
+
+		$arraycodFase = array(  'id_fase1' => 1, 
+								'id_fase2' => 2,
+								'id_fase3' => 3,
+								'id_fase4' => 4,
+								'id_fase5' => 5,
+								'id_fase6' => 6,
+								'id_fase7' => 7,
+								'id_fase8' => 8,
+								'id_fase9' => 9,
+								'id_fase10' => 10);
+
+		$arrayTiempoFin = array();
+		
+		foreach ($rqAsig as $keyt => $valuet){
+
+			$tiempo = DB::select('SELECT * FROM tb_tiempos WHERE fase="instlinea" AND id_requerimiento = :id', ['id' => $valuet->id_requerimiento]);
+		
+			if($tiempo){
+				foreach ($tiempo as $keytt => $valuett){
+					if($tiempo[$keytt]->fase == $nombre_fase and $tiempo[$keytt]->estado == 'I'){
+			    		$arrayTiempoFin[] =  array(
+			    									'id_tp'=> $tiempo[$keytt]->id_tiempo,
+			    									'id_rq'=> $tiempo[$keytt]->id_requerimiento
+			    									);
+		    		}	
+				}
+	    	}
+		}
+
+		$arrayAdjunto = array();
+		$arrayAdj = array();
+		$arrayAdjuntos = array();
+		$arrayAdjTodos = array();
+
+		foreach ($rqAsig as $keyad => $valuead){
+			$arrayAdj = array();
+			$adjTodos = array();
+
+			$adjuntos = DB::table('tb_adjuntos')
+			->where('id_requerimiento', '=' , $valuead->id_requerimiento)
+			//->where('id_requerimiento', '=' , 3784)
+			->where('id_etapa', '=' , 8)
+			//->where('id_etapa', '=' , '1')
+			->select('id_adjunto', 'id_requerimiento', 
+					 'id_etapa', 'nombre', 
+					 'fecha', 'hora')
+			->get();
+
+			if($adjuntos->isEmpty()){
+				$adjVacio = array ( 0 => array(
+									'id_adjunto' => 0,
+									'id_requerimiento' => $valuead->id_requerimiento,
+									'id_etapa' => 8,
+									'nombre' => '',
+									'fecha' => '',
+									'hora' => ''
+								 ));
+				$arrayAdj[$valuead->id_requerimiento] = $adjVacio;
+				$adj_vacio=0;
+
+			}else{ $adj_vacio=1;
+				$arrayAdj[$valuead->id_requerimiento] = $adjuntos;
+			}
+
+			$adjTodos[$valuead->id_requerimiento] = $this->adjuntoArchivos($valuead->id_requerimiento,1000);
+
+			array_push($arrayAdjTodos, $adjTodos);
+			array_push($arrayAdjunto, $arrayAdj);
+		}
+ 
+		$nombreFuncion = 'detalleControlVerPendientes';
+		
+
+		$rqAsignadosHisto = array();
+		$arrayAdjuntos = json_decode(json_encode($arrayAdjunto));
+		$rqAsignados = json_decode(json_encode($rqAsignados));
+		$arrayAdjTodos = json_decode(json_encode($arrayAdjTodos));
+								
+		return view('operador.rq_detalle_control_svn')->with(compact('detalle','rqAsignados','rqAsignadosHisto','pagTitulo','activo','arraycodFase','arrayTiempoFin','rqDesarrollo','rqAsig','rqPrueba','arrayAdjuntos','nombreFuncion','req_id','arrayAdjTodos','nombre_fase','adj_vacio'));
+	}
+
+	public function revGuadarCertSvn(Request $request, $id){
+		
+	    date_default_timezone_set('America/La_Paz');
+	    
+	    $user = \Auth::user();
+
+		if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+	    if(!empty($request->textDesc)){
+
+				// ingresar registros en asignación de requerimientos..
+				$rqCertsVN = ControlSvn::find($id);
+				$fecha = date('Y-m-d');
+				$hora = date('H:i:s');
+				$rqCertsVN->fecha_cert = $fecha;
+				$rqCertsVN->hora_cert = $hora;
+				$rqCertsVN->id_operador = $user->id;
+				$rqCertsVN->accesible = 'No';
+
+		    	if($rqCertsVN->save()){// save
+			        
+			        return redirect()->route('revCertificacionSvn')->with(array(
+				    		'message' => 'El requerimiento fue registrado exitosamente!.'
+				    	));
+					
+				}
+				return redirect()->route('detalleCertificacionSvn', $id)->with(array(
+			    		'error' => 'Error, vuelva a intentar otra vez!.'
+			    		));
+
+			}else{
+				return redirect()->route('detalleCertificacionSvn', $id)->with(array(
+			    		'error' => 'Error, El campo Comentario es obligatorio!.'
+			    		));
+			    }
+	}
+
+	public function revRechazarCertSvn(Request $request, $id){
+		
+	    date_default_timezone_set('America/La_Paz');
+	    
+	    $test = $this->pruebatrait(1000);
+dd($test);
+	    $user = \Auth::user();
+
+		if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+	    if(!empty($request->textDesc)){
+
+				// ingresar registros en asignación de requerimientos..
+				$rqCertsVN = ControlSvn::find($id);
+				$fecha = date('Y-m-d');
+				$hora = date('H:i:s');
+				$rqCertsVN->fecha_cert = $fecha;
+				$rqCertsVN->hora_cert = $hora;
+				$rqCertsVN->id_operador = $user->id;
+				$rqCertsVN->accesible = 'No';
+
+		    	if($rqCertsVN->save()){// save
+			        
+			        return redirect()->route('revCertificacionSvn')->with(array(
+				    		'message' => 'El requerimiento fue registrado exitosamente!.'
+				    	));
+					
+				}
+				return redirect()->route('detalleCertificacionSvn', $id)->with(array(
+			    		'error' => 'Error, vuelva a intentar otra vez!.'
+			    		));
+
+			}else{
+				return redirect()->route('detalleCertificacionSvn', $id)->with(array(
+			    		'error' => 'Error, El campo Comentario es obligatorio!.'
+			    		));
+			    }
+	}
+
+
+
 
 }

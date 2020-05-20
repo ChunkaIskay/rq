@@ -176,7 +176,7 @@ Route::post('Operador/guardar-req','Operador\ImportantTasksController@guardarReq
 
 // subir archivo
 Route::post('Operador/subir-archivo','Operador\ImportantTasksController@uploadFile')->name('subirArchivo');
-Route::post('Operador/delete-file','Operador\ImportantTasksController@deleteFile')->name('deleteFileOpe');
+Route::post('Operador/delete-filec','Operador\ImportantTasksController@deleteFile')->name('deleteFileOpe');
 
 // Certificaciones Pre-intalación Soluciones de req. a ser certifición
 Route::get('Operador/certificaciones', 'Operador\ImportantTasksController@reqListarCertificaciones')->name('reqListarCert');
@@ -189,6 +189,29 @@ Route::post('Operador/rev-req-tiempo-asig','Operador\ImportantTasksController@re
 Route::post('Operador/rev-req-tiempo-val','Operador\ImportantTasksController@revValidarRq')->name('revValidarReqCert');
 /***** ajax solución a tarea  *****/
 Route::post('Operador/rev-req-solucion-tarea','Operador\ImportantTasksController@revSolucionTarea')->name('revSolTareaCert');
+
+
+
+//Certificación on line.
+Route::get('Operador/certificaciones-online', 'Operador\ImportantTasksController@revListarCertOnline')->name('revCertificacionOnLine');
+Route::get('Operador/{id}/rev-detalle-cert-online', 'Operador\ImportantTasksController@revDetalleCertOnline')->name('detalleCertificacionOnLine');
+Route::post('Operador/{id}/rev-guardar-cert','Operador\ImportantTasksController@revGuadarCertOnline')->name('guadarCertOnline');
+
+/**** ajax tiempo de desrrollo ****/
+Route::post('Operador/rev-req-guardar-cert','Operador\ImportantTasksController@revGuadarReqAsig')->name('guadarReqCertOl');
+Route::post('Operador/rev-req-tiempo-cert','Operador\ImportantTasksController@revAsigTiempoReq')->name('revAsigMostrarCertOl');
+Route::post('Operador/rev-req-tiempo-val-cert','Operador\ImportantTasksController@revValidarRq')->name('revValidarReqCertOl');
+
+/*** Donwload ***/
+Route::get('Operador/{id}/download/','Operador\ImportantTasksController@download')->name('downloadFileOpe');
+Route::post('Operador/delete-file','Operador\ImportantTasksController@deleteFile')->name('deleteFileCertO');
+
+//Certificaciones SVN
+Route::get('Operador/certificaciones-svn', 'Operador\ImportantTasksController@revListarCertSvn')->name('revCertificacionSvn');
+Route::get('Operador/{id}/rev-detalle-cert-svn', 'Operador\ImportantTasksController@revDetalleCertSvn')->name('detalleCertificacionSvn');
+Route::post('Operador/{id}/rev-guardar-cert','Operador\ImportantTasksController@revGuadarCertSvn')->name('guadarCertSvn');
+
+Route::post('Operador/{id}/rev-rechazar-cert-svn','Operador\ImportantTasksController@revRechazarCertSvn')->name('rechazarCertSvn');
 
 
 /*************** Verificador **************/
@@ -224,13 +247,6 @@ Route::post('Verificador/rq-revisar-detalle','Verificador\ImportantTasksControll
 
 /**** DESARROLLADOR *****/
 
-Route::get('Desarrollador/rev-asig-inst', 'Desarrollador\ImportantTasksController@revListarAsigInstInstalar')->name('revListarAsigInst');
-Route::post('Desarrollador/search-rev-asig-inst','Desarrollador\ImportantTasksController@searchRevAsigInst')->name('searchRevAsignarInst');
-
-Route::get('Desarrollador/{id}/rev-detalle-asig-inst', 'Desarrollador\ImportantTasksController@revDetalleAsigInst')->name('detalleRevAsigInst');
-
-Route::post('Desarrollador/{id}/rev-guardar-inst','Desarrollador\ImportantTasksController@revGuadarInstalar')->name('guadarRevInstalar');
-
 // revisar requerimiento asignados
 Route::get('Desarrollador/rev-req-asig', 'Desarrollador\ImportantTasksController@revListarReqAsig')->name('revListarReqAsig');
 Route::post('Desarrollador/search-rev-req-asig','Desarrollador\ImportantTasksController@searchReqAsig')->name('searchRevReqAsig');
@@ -240,19 +256,29 @@ Route::get('Desarrollador/{id}/rev-req-detalle-asig', 'Desarrollador\ImportantTa
 /**** ajax tiempo de desrrollo ****/
 Route::post('Desarrollador/rev-req-guardar-asig','Desarrollador\ImportantTasksController@revGuadarReqAsig')->name('guadarReqAsig');
 
-Route::post('Desarrollador/rev-req-tiempo-asig','Desarrollador\ImportantTasksController@revAsigTiempoReq')->name('revAsigMostrarDet');
-
+Route::post('Desarrollador/rev-req-tiempo-asig1','Desarrollador\ImportantTasksController@revAsigTiempoReq')->name('revAsigMostrarDet');
 Route::post('Desarrollador/rev-req-tiempo-val','Desarrollador\ImportantTasksController@revValidarRq')->name('revValidarReq');
 /***** ajax solución a tarea  *****/
 Route::post('Desarrollador/rev-req-solucion-tarea','Desarrollador\ImportantTasksController@revSolucionTarea')->name('revSolTarea');
 
-
-
 /***** Download*****/
-
 Route::post('Desarrollador/subir-archivo','Desarrollador\ImportantTasksController@uploadFile')->name('subirArchivo');
 Route::post('Desarrollador/delete-file','Desarrollador\ImportantTasksController@deleteFile')->name('deleteFileDesa');
 
+//Rev. Asignacion  de req  a Instalar
+Route::get('Desarrollador/rev-asig-inst', 'Desarrollador\ImportantTasksController@revListarAsigInstInstalar')->name('revListarAsigInst');
+Route::get('Desarrollador/{id}/rev-detalle-req-inst', 'Desarrollador\ImportantTasksController@revDetalleAsigInst')->name('detalleRevAsigInst');
+Route::post('Desarrollador/{id}/rev-guardar-inst','Desarrollador\ImportantTasksController@revGuadarInstalar')->name('guadarRevInstalar');
+
+/**** ajax tiempo de desarrollo ****/
+Route::post('Desarrollador/rev-req-guardar-asig','Desarrollador\ImportantTasksController@revGuadarReqAsig')->name('guadarReqAsig');
+Route::post('Desarrollador/rev-req-tiempo-asig','Desarrollador\ImportantTasksController@revAsigTiempoReq')->name('revAsigMostrarInst');
+Route::post('Desarrollador/rev-req-tiempo-val','Desarrollador\ImportantTasksController@revValidarRq')->name('revValidarReq');
+
+//Control de versinoes pendientes
+Route::get('Desarrollador/control-versiones-pendientes', 'Desarrollador\ImportantTasksController@revListarControlVerPtes')->name('revListarControlVerPendientes');
+Route::get('Desarrollador/{id}/rev-detalle-cont-ver-pend', 'Desarrollador\ImportantTasksController@revDetalleControlVer')->name('detalleControlVerPendientes');
+Route::post('Desarrollador/{id}/rev-guardar-control-ver','Desarrollador\ImportantTasksController@revGuaxdarControlVerPed')->name('guadarControlVerPen');
 
 
 
@@ -275,7 +301,10 @@ Route::middleware(['auth','JefeOperaciones'])->prefix('JefeOperaciones')->namesp
 	//lista
 	Route::get('/rq-pendientes-instalar', 'ImportantTasksController@rqPendientesInstalar')->name('pendienteInstalar');
 	//detalle
-	Route::get('/{id}/rq-pend-inst-detalle', 'ImportantTasksController@rqPendInstDetalle')->name('pendInstalarDetelle');
+	Route::get('/{id}/rq-pend-inst-detalle', 'ImportantTasksController@rqPendInstDetalle')->name('pendInstalarDetelle');		
+	//guardar
+	Route::post('/rq-pend-inst-aprobar', 'ImportantTasksController@rqAprobarAsigInstalarDesc')->name('aprobarAsigInstalarDesc');
+
 	//lista
 	Route::get('/rq-examinar','ImportantTasksController@rqExaminarList')->name('examinarList');
 	//detalle

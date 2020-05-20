@@ -6,26 +6,26 @@
 @if($k == $value1->id_requerimiento)  
  <div class="card shadow mb-4">
     <!-- Card Header - Accordion -->
-    <a href="#collapseCardExample3" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample3">
+    <a href="#collapseCardExample2" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample2">
       <h6 class="m-0 font-weight-bold text-primary">Descargas</h6>
     </a> 
     <!-- Card Content - Collapse -->
-    <!--<div class="collapse show" id="collapseCardExample3">-->
+    <!--<div class="collapse show" id="collapseCardExample2">-->
     
-    <div class="collapse" id="collapseCardExample3">
+    <div class="collapse" id="collapseCardExample2">
       <div class="card-body">
        <div class="list-group">
-          <form  class="md-form" action="{{ url('/Desarrollador/subir-archivo') }}" method="post" enctype="multipart/form-data">
+          <form  class="md-form" action="{{ url('/Operador/subir-archivo') }}" method="post" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="row" style="margin-left: 10px; margin-right: 10px;">      <!--<div class="col-lg-1 text-left"> 
                       <a href="#" type="submit" class="btn btn-success btn-circle btn-sm">
                           <i class="fas fa-upload"></i></a>
                 </div>-->
                 <input type="hidden" name="idrq" value="{{ $value1->id_requerimiento }}">
-                 @if(empty($adjuntos[0]->id_etapa))
+                 @if(empty($v[0]->id_etapa))
                 <input type="hidden" name="etapa" value="4">
                  @else
-                <input type="hidden" name="etapa" value="{{ $arrayAdjuntos[$value1->id_requerimiento]->id_etapa }}">
+                <input type="hidden" name="etapa" value="{{ $v[0]->id_etapa }}">
                  @endif
                 <input type="hidden" name="nombreFuncion" value="{{ $nombreFuncion }}">
               <div class="col-lg-8 text-left"> 
@@ -38,7 +38,6 @@
           </form>
           <br>
           @foreach($v as $keyc => $valuec)
-          
             @if(!empty($valuec->id_adjunto))
              <div class="row">
                 <div class="col-lg-11 text-left"> 
@@ -52,11 +51,11 @@
               </div>
             @endif  
           @endforeach
+
         </div>
       </div>
     </div>
 </div>
-
 @endif
 @endforeach
 @endforeach

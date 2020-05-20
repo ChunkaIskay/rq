@@ -1,4 +1,7 @@
-<!-- LIST -->
+@extends('layouts.app')
+
+@section('content')
+ <!-- Begin Page Content -->
 <style>
 #div1, #div2, #div3 {
   float: left;
@@ -31,76 +34,47 @@ hr {
 }
 
 </style>
-	<br>
-	<div class="card shadow mb-4">
-	  <!-- Card Header - Accordion -->
-	  <a href="#asig" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="asig">
-	    <h6 class="m-0 font-weight-bold text-primary">Lista de requerimientos para sus respectivas Pruebas</h6>
-	  </a> 
-	  <!-- Card Content - Collapse -->
-	  <!--<div class="collapse show" id="asig">-->
-
-	  <div class="collapse show" id="asig">
-	    <div class="card-body">
-	    <div class="row text-left">
-		  <div class="col-4 text-leeft"> <label>Asignación</label></div>
-		  <div class="col-4 text-leeft"> <label>Pruebas</label></div>
-		  <div class="col-4 text-leeft"> <label>Certificado</label></div>
-		</div>
-		
-		<div class="table-responsive border border-warning" id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">	        
-        @if(!empty($rqAsignados))	
-        @foreach($rqAsignados as $key => $value) 
-	      	<a onmousedown="mouseDown({{ $value->id_requerimiento }} ,'validar',0)" onmouseup="showDiv(this,'mostrar',{{ $value->id_requerimiento }} );" class="d-block imgBack card"  role="button" id='mostrar_{{ $value->id_requerimiento }}' ondragstart="drag(event)" draggable="true" placeholder="{{ $value->id_requerimiento }}" style="cursor:pointer;" ><br><h4 style="color:#5c1465;">{{ $value->id_requerimiento }}</h4><p style="font-size:11px;color:#070b8c;">{{ $value->prioridad }}</p>
-			</a>
-			
-        @endforeach
-        @endif
-	 	</div>
-	 	<form  class="md-form" id="logout-form2" action="{{ url('/Desarrollador/rev-req-guardar-asig') }}" method="post" enctype="multipart/form-data">
-           {{ csrf_field() }}
-           @if($errors->any())
-            <div class="alert alert-danger">
-              <ul>
-                @foreach($errors->all() as $error)
-                  <li>{{$error}}</li>
-                @endforeach
-              </ul>
-            </div>
-           @endif
-	 	<span class="table-responsive border border-success"  id="div2" ondrop="drop(event)" ondragover="allowDrop(event)">
-	 		@if(!empty($rqDesarrollo))	
-		        @foreach($rqDesarrollo as $keyd => $valued) 
-					<a onmousedown="mouseDown({{ $valued->id_requerimiento }} ,'validar',0)" onmouseup="showDiv(this,'mostrar',{{ $valued->id_requerimiento }} );" class="d-block imgBack card"  role="button" class='drag_{{ $valued->id_requerimiento }}' id='mostrar_{{ $valued->id_requerimiento }}' ondragstart="drag(event)" draggable="true" placeholder="{{ $valued->id_requerimiento }}" style="cursor:pointer;" ><br><h4 style="color:#5c1465;">{{ $valued->id_requerimiento }}</h4><p style="font-size:11px;color:#070b8c;">{{ $valued->prioridad }}</p>
-					</a>
-			    @endforeach
-		    @endif
-	 	</span>
-	</form>
-			<div onmouseover="iniSolucion(this)" onmouseout="darSolucion(this)" class="table-responsive border border-danger"  id="div3" ondrop="drop(event)" ondragover="allowDrop(event)">
-			 		@if(!empty($rqPrueba))	
-				        @foreach($rqPrueba as $keyp => $valuep) 
-							<a class="d-block imgBack card"  role="button" id='mostrar_{{ $valuep->id_requerimiento }}' ondragstart="drag(event)" draggable="false" placeholder="{{ $valuep->id_requerimiento }}"  ><br><h4 style="color:#848181;">{{ $valuep->id_requerimiento }}</h4><p style="font-size:11px;color:#848181;">{{ $valuep->prioridad }}</p>
-							</a>
-					    @endforeach
-				   @endif
-			 </div>
-	  </div>
+@if(session('message'))
+	<div class="alert alert-success">
+	    {{ session('message') }}
 	</div>
-	<br> 
-	<!--<a id="mostrar_1" onclick="showDiv('mostrar',1 )"  style="cursor:pointer;">datosss</a>-->
-        <!-- Cantidad de horas trabajadas. -->
+@endif  
+@if(session('error'))
+	<div class="alert alert-danger">
+	    {{ session('error') }}
+	</div>
+@endif
+
+<!-- Page Heading -->
+<h1 class="h3 mb-2 text-gray-800">{{ $pagTitulo }}</h1>
+<p class="mb-4">Detalle del Requerimiento. Recuerde subir por lo menos un documento adjunto para que pueda Instalar el requerimiento.</p>
+<!-- progress bar -->
+
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+	<div class="card-header py-3">
+		<h6 class="m-0 font-weight-bold text-primary">Detalle</h6>
+	</div>
+
+	<div class="card-body">
+
+	<div class="card shadow mb-4">
+	<!-- Cantidad de horas trabajadas. -->
     @foreach($rqAsig as $key => $value1) 
+    
+    	@if($key == 0 )
+	    	<!--{{ $idrequerimiento = $value1->id_requerimiento }}-->
+    	@endif
     	@if($req_id == $value1->id_requerimiento)
     	<div class="card shadow mb-5" id="target_{{ $value1->id_requerimiento }}" style="display: block;">
     	@else
-    	<div class="card shadow mb-5" id="target_{{ $value1->id_requerimiento }}" style="display: none;">
+    	<div class="card shadow mb-5" id="target_{{ $value1->id_requerimiento }}" style="display: block;">
     	@endif
         <div class="card-header py-3">
           <h6 class="m-0 font-weight-bold text-primary">Requerimiento {{ $value1->id_requerimiento }}</h6>
         </div>
         <div class="card-body">
-            <h1>Cantidad de horas trabajadas hasta ahora</h1>
+            <h1>Horas trabajadas hasta ahora en instalación.</h1>
 			<div class="crono_wrapper">
 			<h2 id='crono_{{ $value1->id_requerimiento }}' style="color: #ece"></h2>
 			<h3 id='crono1_{{ $value1->id_requerimiento }}'></h3>
@@ -109,15 +83,16 @@ hr {
 				<h3 style="color: #ece">El requeriminto esta suspendido</h3>
 				<input type="hidden" value="0" name="tiempo_i_{{ $value1->id_requerimiento }}" id="tiempo_i_{{ $value1->id_requerimiento }}" >
 			@else
+			<input type="hidden" value="{{ $nombre_fase }}" name="nom_fase" id="nom_fase" >
 				@foreach($arrayTiempoFin as $keyt => $valuet) 
 					@if($valuet['id_rq'] == $value1->id_requerimiento)
 						<!--{{ $aux=1 }}-->	
-						<input type="button" name='tarea_{{ $value1->id_requerimiento }}' id='tarea_{{ $value1->id_requerimiento }}' value="DETENER TAREA" onclick="iniciarFinalizar(this,{{ $value1->id_requerimiento }});"> 
+						<input type="button" name='tarea_{{ $value1->id_requerimiento }}' id='tarea_{{ $value1->id_requerimiento }}' value="DETENER TAREA INSTALACION ONLINE" onclick="iniciarFinalizar(this,{{ $value1->id_requerimiento }});"> 
 						<input type="hidden" value="{{$valuet['id_tp']}}" name="tiempo_i_{{ $value1->id_requerimiento }}" id="tiempo_i_{{ $value1->id_requerimiento }}" >
 				    @endif
 				@endforeach
 				@if($aux==0)
-					<input type="button" name='tarea_{{ $value1->id_requerimiento }}' id='tarea_{{ $value1->id_requerimiento }}' value="INICIAR TAREA" onclick="iniciarFinalizar(this,{{ $value1->id_requerimiento }});">
+					<input type="button" name='tarea_{{ $value1->id_requerimiento }}' id='tarea_{{ $value1->id_requerimiento }}' value="INICIAR TAREA INSTALACION ONLINE" onclick="iniciarFinalizar(this,{{ $value1->id_requerimiento }});">
 					<input type="hidden" value="0" name="tiempo_i_{{ $value1->id_requerimiento }}" id="tiempo_i_{{ $value1->id_requerimiento }}" >
 				@endif
 			@endif
@@ -289,27 +264,37 @@ hr {
                   </div>
             </div>
             <hr>                  
-            @include('operador.listado_adjunto_cert')
+            @include('desarrollador.listado_adjunto_sol')
             <br>
             <br>
+            <br>
+            @include('desarrollador.subir_adjunto_etapas')
             <div class="row">
-                  <div class="col-lg-12 text-left"> 
-                     <div class="my-2"></div>
-                     <a id="ocultar_0" onclick="showDiv('del','ocultar', 0 )"  style="cursor:pointer;" class="btn btn-danger btn-icon-split" data-toggle="modal" >
-                      <span class="icon text-white-50">
-                        <i class="fas fa-exclamation-triangle"></i>
-                      </span>
-                      <span class="text">Cerrar</span>
-                    </a>
-                  </div>
+            @if($adj_vacio == 1)
+            <div class="col-lg-6 text-right">  
+                <div class="my-2"></div>  
+                <a href="#" class="btn btn-success btn-icon-split" data-toggle="modal" data-target="#textoModal_{{ $value1->id_requerimiento }}">
+                  <span class="icon text-white-50">
+                    <i class="fas fa-check"></i>
+                  </span>
+                  <span class="text">Instalar</span>
+                </a>
               </div>
-            <br>
-            <br>
-            @include('operador.subir_adjunto_cert')
-            <div class="row">
-              <div class="col-lg-6 text-right">  
+             @else
+             <div class="col-lg-6 text-right">  
+                <div class="my-2"></div> 
+                <a href="#" class="btn btn-secondary btn-icon-split" data-toggle="modal" data-target="#">
+                  <span class="icon text-white-50">
+                    <i class="fas fa-check"></i>
+                  </span>
+                  <span class="text">Instalar</span>
+                </a>
+              </div>
+             @endif
+            
+              <div class="col-lg-6 text-left">  
                 <div class="my-2"></div>
-                  <a class="btn btn-primary" href="{{ route('reqListarCert') }}">
+                  <a class="btn btn-primary" href="{{ route('revListarAsigInst') }}">
                   Cerrar ventana
                   </a>
               </div>
@@ -322,45 +307,39 @@ hr {
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalLabel_{{ $value1->id_requerimiento }}">Ingrese la descripción a la solución del Requerimiento {{ $value1->id_requerimiento }}.</h5>
+          <h5 class="modal-title" id="modalLabel_{{ $value1->id_requerimiento }}">Datos de la instalación del  requerimiento {{ $value1->id_requerimiento }}.</h5>
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">x</span>
           </button>
 
         </div>
         <div class="modal-body">
-              <form id="logout-form1_{{ $value1->id_requerimiento }}" action="" method="POST" >
+              <form id="logout-form1_{{ $value1->id_requerimiento }}" action="{{ route('guadarRevInstalar', $value1->id_requerimiento ) }}" method="POST" >
                   {{ csrf_field() }}
+                  <input type="hidden" name="id_reqqq" value="{{ $value1->id_requerimiento }}">
               	  <div class="col-lg-12">
-	                  Detalle de la certificación
-			              </div>
-	              <div class="col-lg-12 text-left">  
-	                  <textarea class="form-control"  rows="4" id="textDesc_{{ $value1->id_requerimiento }}" placeholder="Escriba el comentarios en detalle por favor!"></textarea>
+	                  Backup 
+				  </div>
+	              <div class="col-lg-12 text-left">
+	                  <textarea class="form-control" name="textDesc" rows="4" id="textDesc_{{ $value1->id_requerimiento }}" required pattern="[A-Za-z0-9]" placeholder="Escriba backup de la instalación."></textarea>
 	              </div>
 	              <div class="col-lg-12">
-	                  Programas de las funcionalidades
-			         </div>
+	                  Comentario 
+				  </div>
 	              <div class="col-lg-12 text-left">  
-	                  <textarea class="form-control"  rows="4" id="text2_{{ $value1->id_requerimiento }}" placeholder="Escriba el comentarios en detalle por favor!"></textarea>
-	              </div><!--
-	              <div class="col-lg-12">
-	                  Progamas Servidores(Opcional)
-			              </div>
-	              <div class="col-lg-12 text-left">  
-	                  <textarea class="form-control"  rows="4" id="textServ_{{ $value1->id_requerimiento }}" placeholder="Escriba el comentarios en detalle por favor!"></textarea>
+	                  <textarea class="form-control" name="textComentario" rows="4" id="textComentario_{{ $value1->id_requerimiento }}" placeholder="Escriba el comentario de la instalación!."></textarea>
 	              </div>
-	              <div class="col-lg-12">
-	                  Tablas Modificadas(Opcional)
-			              </div>
-	              <div class="col-lg-12 text-left">  
-	                  <textarea class="form-control"  rows="4" id="textModi_{{ $value1->id_requerimiento }}" placeholder="Escriba el comentarios en detalle por favor!"></textarea>
-	              </div> -->
               </form>
             </div>
-          <div class="modal-footer">
-        	<div id="result"></div>
-        	<button class="btn btn-secondary" type="button" data-dismiss="modal">Aceptar</button>
-          </div>
+            <div class="modal-footer">
+	            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+	              <a class="btn btn-primary" href=""
+	                  onclick="event.preventDefault();
+	                           document.getElementById('logout-form1_{{ $value1->id_requerimiento }}').submit();">
+	                  Intalar
+	              </a>
+	        
+        	</div>
       </div>
     </div>
   </div>
@@ -400,13 +379,13 @@ hr {
           <!--<a class="btn btn-primary" href="login.html">Logout</a>-->
               <a class="btn btn-primary" href="{{ route('logout') }}"
                     onclick="event.preventDefault();
-                    document.getElementById('logout-formDE').submit();">
+                    document.getElementById('logout-form1').submit();">
                     Eliminar Archivo
               </a>
               <div class="modal-body">
-              <form id="logout-formDE" action="{{ route('deleteFileOpe') }}" method="POST" style="display: none;">
+              <form id="logout-form1" action="{{ route('deleteFileDesa') }}" method="POST" style="display: none;">
                   {{ csrf_field() }}
-                  <input type="hidden" name="id_requerimiento" value="">
+                  <input type="hidden" name="id requerimiento" value="">
                   <input type="hidden" name="nombreFuncion" value="{{ $nombreFuncion }}">
                   <input type="text" name="idAdjunto" id="idAdjunto" value=""/>
               </form>
@@ -415,10 +394,16 @@ hr {
       </div>
     </div>
   </div>
-  
+  </div>
+    <div class="row">
+      <div class="col-md-4"></div>
+      <div class="col-md-4 text-left"></div>
+      <div class="col-md-3"></div>
+    </div> 
+</div>
 <!--	
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>-->
-       <script type = "text/javascript">
+<script type = "text/javascript">
 
          $.ajaxSetup({
              headers: {
@@ -441,8 +426,9 @@ function drop(ev) {
 
 	$.ajax({
 	    type:"POST",
-	    url:"{{route('guadarReqAsigCert')}}",
+	    url:"{{route('guadarReqAsig')}}",
 	    data:{'name': data1},
+
 	    dataType : 'html',
 	    success: function(data){
 	    	//render(selectedEvent, data);
@@ -480,22 +466,24 @@ function drop(ev) {
 
 </script>
 
-	<script>
+<script>
+
 	var inicio=0;
 	var timeout=0;
 	var horas_cal = 0;
-  var minutos_cal = 0;
-  var segundos_cal = 0;
-  var horas_inicial = 0;
-  var anioo = 0;
+	var minutzzos_cal = 0;
+	var segundos_cal = 0;
+	var horas_inicial = 0;
+	var anioo = 0;
 	var mess = 0;
 	var diaa = 0;
 	var id_rq = 0;
 	var tiempo_i = 0;
 	var timeout1 = 0;
-	var id_reqq = 0;
+	var id_reqq = 0
+	var nom_fase = 'no_fase';
 
- 
+
 	function iniciarFinalizar(elemento,idReq)
 	{     
 		id_rq = idReq;
@@ -504,9 +492,7 @@ function drop(ev) {
 		tiempo_i=document.getElementById("tiempo_i_"+idReq).value;
 		var horaa=document.getElementsByTagName('h2').item(0);
 		var tarea=document.getElementById("tarea_"+idReq).value;
-
-		
-	  	
+			  	
 	  	var time_dato = horaa.innerHTML;
 	  	var time_split = time_dato.split(':');
         // alert(time_split[0]+'----'+time_split[1]+'----'+time_split[2]);
@@ -516,16 +502,16 @@ function drop(ev) {
 
  		if(timeout==0)
 		{ 
-			if(tiempo_i==0){  
+			if(tiempo_i==0){  //alert('388');
 				mostrarDetalle(idReq,'insert',0);
-				// INICIAR TAREA el cronometro
-	 			elemento.value="DETENER TAREA";
+				// INICIAR TAREA INSTALACION ONLINE el cronometro
+	 			elemento.value="DETENER TAREA INSTALACION ONLINE";
 	 			// Obtenemos el valor actual
 				inicio=vuelta=new Date().getTime();
 				funcionando();
 			}else{  
 				mostrarDetalle(idReq,'updateI',tiempo_i);
-				elemento.value="INICIAR TAREA";
+				elemento.value="INICIAR TAREA INSTALACION ONLINE";
 				clearTimeout(timeout);
 				timeout=0;
 			}
@@ -533,7 +519,7 @@ function drop(ev) {
 			// detemer el cronometro
 			mostrarDetalle(idReq,'update',0);
 			
-			elemento.value="INICIAR TAREA";
+			elemento.value="INICIAR TAREA INSTALACION ONLINE";
 			clearTimeout(timeout);
 			timeout=0;
 		}
@@ -571,7 +557,7 @@ function drop(ev) {
 
 
 function showDiv(obj,mostrar, code){ 
-//	alert('showdiv');
+
 	if(obj == 'del'){
 		if(code == 0){
 
@@ -642,7 +628,8 @@ function showDiv(obj,mostrar, code){
 function mostrarDetalle(idReq,accion,tiempo_i){
 	
 	var tiempoId=0;
-	
+	nom_fase=document.getElementById('nom_fase').value;
+
 	if(accion=='ver'){
 		tiempoId=document.getElementById('tiempo_i_'+idReq).value;	
 	}
@@ -652,14 +639,11 @@ function mostrarDetalle(idReq,accion,tiempo_i){
 	if(accion=='updateI'){
 		tiempoId=document.getElementById('tiempo_i_'+idReq).value;
 	}
-console.log(idReq);
-console.log(accion);
-console.log(tiempo_i);
 
 	$.ajax({
 		    type:"POST",
-		    url:"{{route('revAsigMostrarDetCert')}}",
-		    data:{'name': idReq,'accion':accion,'tiempo_id':tiempoId},
+		    url:"{{route('revAsigMostrarInst')}}",
+		    data:{'name': idReq,'accion':accion,'tiempo_id':tiempoId,'nom_fase':nom_fase},
 	        dataType : 'html',
 		    success: function(data){
 		    	var para_hora = JSON.parse(data);
@@ -685,7 +669,7 @@ function mouseDown(idReq,accion,tiempo_i) {
 
 		$.ajax({
 					type: "POST",
-			        url: "{{route('revValidarReqCert')}}",
+			        url: "{{route('revValidarReq')}}",
 			        data: {'name': idReq,'accion':accion,'tiempo_id':tiempo_i},
 			        dataType : 'html',
 			       
@@ -708,7 +692,7 @@ function mouseDown(idReq,accion,tiempo_i) {
 			var status = JSON.stringify(resText);
 			
 			if(resText == 422 ){ 
-				 $('#modalText').html('Error: El requerimiento esta en desarrollo, para terminar la tarea presione el boton DETENER TAREA!');
+				 $('#modalText').html('Error: El requerimiento esta en desarrollo, para terminar la tarea presione el boton DETENER TAREA INSTALACION ONLINE!');
 			}
 
 			if(resText == 421){  
@@ -744,16 +728,17 @@ if(id_reqq != 0){
 	if(document.getElementById('mostrar_'+id_reqq).parentNode.nodeName=='DIV'){
 		  
 		 var texto_desc=document.getElementById('textDesc_'+id_reqq).value;
-		 var texto_2=document.getElementById('text2_'+id_reqq).value;
-		 /*var texto_servidores=document.getElementById('textServ_'+id_reqq).value;
+		 /*var texto_cliente=document.getElementById('textClient_'+id_reqq).value;
+		 var texto_servidores=document.getElementById('textServ_'+id_reqq).value;
 		 var texto_tabla=document.getElementById('textModi_'+id_reqq).value;*/
+		 var texto_cliente='';
 		 var texto_servidores='';
 		 var texto_tabla='';
 
 		$.ajax({
 			type: "POST",
-	        url: "{{route('revSolTareaCert')}}",
-	        data: {'idRq': id_reqq,'accion':'insert','tiempo_id':'','texto_desc':texto_desc,'texto_2':texto_2,'texto_servidores':texto_servidores,'texto_tabla':texto_tabla},
+	        url: "{{route('revSolTarea')}}",
+	        data: {'idRq': id_reqq,'accion':'insert','tiempo_id':'','texto_desc':texto_desc,'texto_cliente':texto_cliente,'texto_servidores':texto_servidores,'texto_tabla':texto_tabla},
 	        dataType : 'html',
 	       
 		    success: function(data){
@@ -769,7 +754,7 @@ if(id_reqq != 0){
 				var status = JSON.stringify(resText);
 				
 				if(resText == 422 ){ 
-					 $('#modalText').html('Error: El requerimiento esta en desarrollo, para terminar la tarea presione el boton DETENER TAREA!');
+					 $('#modalText').html('Error: El requerimiento esta en desarrollo, para terminar la tarea presione el boton DETENER TAREA INSTALACION ONLINE!');
 				}
 
 				if(resText == 421){  
@@ -792,5 +777,6 @@ if(id_reqq != 0){
  
 }
 
-
+mostrarDetalle({{ $idrequerimiento }},'ver',0);
 </script>
+@endsection

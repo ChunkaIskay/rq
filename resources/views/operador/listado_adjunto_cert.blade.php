@@ -5,12 +5,12 @@
 @if($k == $value1->id_requerimiento)  
  <div class="card shadow mb-4">
       <!-- Card Header - Accordion -->
-      <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+      <a href="#collapseCardExample13" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample13">
         <h6 class="m-0 font-weight-bold text-primary">Listado de Descargas por Fases</h6>
       </a> 
       <!-- Card Content - Collapse -->
-      <!--<div class="collapse show" id="collapseCardExample">-->
-      <div class="collapse" id="collapseCardExample">
+      <!--<div class="collapse show" id="collapseCardExample13">-->
+      <div class="collapse" id="collapseCardExample13">
         <div class="card-body">
          <div class="list-group">
             <br>  
@@ -28,7 +28,10 @@
                <h4 class="h6 mb-2 text-gray-800">Fase de Certificacion Pre-Instalacion</h4>
               @endif
               @if($descargas->id_etapa == 7)
-              <h4 class="h6 mb-2 text-gray-800">Instalaci&oacute;n por Des.</h4>
+              <h4 class="h6 mb-2 text-gray-800">Instalaci&oacute;n.</h4>
+              @endif
+              @if($descargas->id_etapa == 8)
+              <h4 class="h6 mb-2 text-gray-800">Certificación Online.</h4>
               @endif
                <div class="row">
                   <div class="col-lg-11 text-left"> 

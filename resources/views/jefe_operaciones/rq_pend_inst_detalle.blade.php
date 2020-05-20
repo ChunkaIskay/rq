@@ -411,20 +411,19 @@ es: "Elegir"
           </button>
         </div>
         <div class="modal-body">Seleccione "Aprobar Requerimiento" para aprobar el  rq {{ $detalle[0]->id_requerimiento }}.</div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <!--<a class="btn btn-primary" href="login.html">Logout</a>-->
-              <a class="btn btn-primary" href="{{ route('logout') }}"
-                  onclick="event.preventDefault();
-                           document.getElementById('logout-form').submit();">
-                  Aprobar Requerimiento
-              </a>
-              <form id="logout-form" action="{{ route('aprobarPendiente1') }}" method="POST" style="display: none;">
+        <form id="logout-formInst" action="{{ route('aprobarAsigInstalarDesc') }}" method="POST" style="display: block;">
                   {{ csrf_field() }}
                   <input type="hidden" name="id" value="{{ $detalle[0]->id_requerimiento }}">
-                  <textarea class="form-control" name="desc_instal" rows="3" id="desc_instal" placeholder="Descripción del la aprobación " name="text"></textarea>
-
-              </form>
+                  <div class="modal-body"><textarea class="form-control" name="desc_instal" rows="3" id="desc_instal" placeholder="Descripción del la aprobación " name="text"></textarea></div>
+        </form><br>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            <!--<a class="btn btn-primary" href="login.html">Logout</a>-->
+            <a class="btn btn-primary" href="{{ route('logout') }}"
+                onclick="event.preventDefault();
+                         document.getElementById('logout-formInst').submit();">
+                Aprobar Requerimiento
+            </a>
         </div>
       </div>
     </div>
@@ -491,16 +490,5 @@ es: "Elegir"
       </div>
     </div>
   </div>
-
-
-
-
-<script type="text/javascript">
-
-
- 
-
-</script>
-
 
 @endsection

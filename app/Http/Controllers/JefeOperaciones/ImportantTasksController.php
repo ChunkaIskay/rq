@@ -1787,7 +1787,7 @@ class ImportantTasksController extends Controller
 		return $lista;
 	}
 
-	public function aprobarRqAsigInstalarDesc(Request $request){
+	public function rqAprobarAsigInstalarDesc(Request $request){
 
 
        // $this->validate($request, Contract::$rules, Contract::$messages);
@@ -1806,18 +1806,21 @@ class ImportantTasksController extends Controller
 				$aprobacion->desc = $request->input('desc_instal');
 				$aprobacion->fecha_instal_aprob = $fecha;
 				$aprobacion->hora_instal_aprob = $hora;
-				
-				
+			
+
 				if (!$aprobacion->save()){
-					return redirect()->route('pendienteInstalar')->with(array(
+					return redirect()->route('pendInstalarDetelle')->with(array(
 						'error' => 'Error: El requerimiento no fue aprobado, consulte con el administrador.!!'
 					));
-				}else{
+				}else{ 
+
 						$rqUpdate = AsigInstalReq::find($request->input('id'));
 						$rqUpdate->accesible = 'Si';
+						$rqUpdate->fecha_asig_instal = $fecha;
+						$rqUpdate->hora_asig_instal = $hora;
 						$rqUpdate->save();
 
-					return redirect()->route('pendienteInstalar')->with(array(
+						return redirect()->route('pendienteInstalar')->with(array(
 						'message' => 'Gracias! El requermiento fue aprobodo con exito.'));
 				}
 			}

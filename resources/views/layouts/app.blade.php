@@ -335,11 +335,11 @@ window.onload = tiempo;
   </a>
 
   <!-- Logout Modal-->
-  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Esta seguro que desea cerrar sesión?</h5>
+          <h5 class="modal-title" id="exampleModalLabel1">Esta seguro que desea cerrar sesión?</h5>
           <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">x</span>
           </button>
@@ -352,11 +352,11 @@ window.onload = tiempo;
 
                 <a class="btn btn-primary" href="{{ route('logout') }}"
                     onclick="event.preventDefault();
-                             document.getElementById('logout-form').submit();">
+                             document.getElementById('logout-formCerrar').submit();">
                     Cerrar sesión
                 </a>
 
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                <form id="logout-formCerrar" action="{{ route('logout') }}" method="POST" style="display: none;">
                     {{ csrf_field() }}
                 </form>
         </div>
@@ -432,21 +432,17 @@ window.onload = tiempo;
    
   });
  
-  
- 
  </script>
   @endauth
   @guest
   <a class="btn btn-primary" href="{{ route('logout') }}"
                       onclick="event.preventDefault();
-                               document.getElementById('logout-form').submit();">
+                               document.getElementById('logout-formLog').submit();">
                       Cerrar sesión
                   </a>
-
-                  <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                  <form id="logout-formLog" action="{{ route('logout') }}" method="POST" style="display: none;">
                       {{ csrf_field() }}
                   </form>
-
   @endguest
 </body>
 </html>

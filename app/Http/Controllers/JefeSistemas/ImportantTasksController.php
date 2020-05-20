@@ -1575,6 +1575,12 @@ class ImportantTasksController extends Controller
 
 	public function rqDetalleAsigSolucionar($id){
 
+		if (!Auth::check()) {
+		   return view('auth.login');	
+		}
+
+		$user = \Auth::user();
+
 		$detalle = DB::select("
 			SELECT li.*, (SELECT concat(users.name , ' ', users.ap_paterno) as nombre_completo FROM users 
 			WHERE users.id = id_gestor ) asig_por, (SELECT concat(users.name , ' ', users.ap_paterno) as nombre_completo FROM users 
@@ -1606,9 +1612,8 @@ class ImportantTasksController extends Controller
 					 'id_etapa', 'nombre', 
 					 'fecha', 'hora')
 			->get();
-
 		// rol de usuario jefe de sistemas = 3
-		$gestor = $this->listUserRol(3);
+		$gestor = $this->listUserRol(3,$user->id);
 		
 		// rol de usuario desarrollador = 2
 		$desarrollador = $this->listUserRol(2);
