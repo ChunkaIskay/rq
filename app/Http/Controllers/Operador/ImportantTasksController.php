@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 use App\Requerimiento;
 use App\Rquerimiento;
@@ -26,11 +27,15 @@ use App\CertOnLine;
 use App\FechaReq;
 use App\Tiempo;
 use App\Traits\RechazarFase;
+use App\Traits\AprobarFase;
 use File;
+use App\Mail\EnvioMailReq;
+use Illuminate\Mail\PendingMail;
 
 class ImportantTasksController extends Controller
 {
     use RechazarFase;
+    use AprobarFase;
 
 	public function rqDetalleAprob($id){
 
@@ -2719,7 +2724,7 @@ class ImportantTasksController extends Controller
 
     }
 
-    public function revDetalleCertSvn(Request $request,$id){
+public function revDetalleCertSvn(Request $request,$id){
 
 		$req_id = 0;
         if(!empty($_GET)){
@@ -2935,6 +2940,7 @@ class ImportantTasksController extends Controller
 		if (!Auth::check()) {
 		   return view('auth.login');	
 		}
+
 	    if(!empty($request->textDesc)){
 
 				// ingresar registros en asignación de requerimientos..
