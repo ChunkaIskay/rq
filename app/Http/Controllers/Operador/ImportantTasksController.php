@@ -2975,7 +2975,7 @@ public function revDetalleCertSvn(Request $request,$id){
 	    date_default_timezone_set('America/La_Paz');
 	    
 	    $test = $this->pruebatrait(1000);
-dd($test);
+
 	    $user = \Auth::user();
 
 		if (!Auth::check()) {
